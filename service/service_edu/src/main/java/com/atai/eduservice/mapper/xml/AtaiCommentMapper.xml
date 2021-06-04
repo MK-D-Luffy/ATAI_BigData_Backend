@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atai.eduservice.mapper.AtaiCommentMapper">
+
+    <!--查询父级评论-->
+    <select id="findByParentIdNull" resultType="com.atai.eduservice.entity.frontvo.CommentFrontVo">
+        SELECT c.*, um.`id` AS authorId,um.`avatar`, um.`nickname`
+        FROM atai_comment c,ucenter_member um
+        WHERE  c.`author_id`=um.`id` AND c.parent_id IS NULL and c.article_id=#{articleId}
+        ORDER BY c.`gmt_create` DESC
+    </select>
+
+    <!--查询一级回复-->
+    <select id="findByParentIdNotNull" resultType="com.atai.eduservice.entity.frontvo.CommentFrontVo">
+        SELECT c.*, um.`id` AS authorId,um.`avatar`, um.`nickname`
+        FROM atai_comment c,ucenter_member um
+        WHERE  c.`author_id`=um.`id` AND c.parent_id = #{id}
+        ORDER BY c.`gmt_create` DESC
+    </select>
+
+</mapper>
