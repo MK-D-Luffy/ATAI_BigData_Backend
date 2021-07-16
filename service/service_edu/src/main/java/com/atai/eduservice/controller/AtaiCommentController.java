@@ -2,30 +2,24 @@ package com.atai.eduservice.controller;
 
 
 import com.atai.commonutils.ordervo.UcenterMemberOrder;
+import com.atai.commonutils.result.R;
 import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
 import com.atai.eduservice.client.UcenterClient;
 import com.atai.eduservice.entity.AtaiComment;
-import com.atai.eduservice.entity.EduComment;
 import com.atai.eduservice.entity.frontvo.CommentFrontVo;
 import com.atai.eduservice.service.AtaiArticleService;
 import com.atai.eduservice.service.AtaiCommentService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import com.atai.commonutils.result.R;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -74,7 +68,7 @@ public class AtaiCommentController {
 //        ataiCommentService.page(pageParam,wrapper);
 //        List<AtaiComment> commentList = pageParam.getRecords();
 //
-        Map<String, Object> map = new HashMap<>();
+//        Map<String, Object> map = new HashMap<>();
 //        map.put("items", commentList);
 //        map.put("current", pageParam.getCurrent());
 //        map.put("pages", pageParam.getPages());

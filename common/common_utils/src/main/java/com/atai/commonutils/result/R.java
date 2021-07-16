@@ -9,20 +9,21 @@ import java.util.Map;
 //统一返回结果的类
 @Data
 public class R {
-    @ApiModelProperty(value = "是否成功")
+    @ApiModelProperty (value = "是否成功")
     private Boolean success;
 
-    @ApiModelProperty(value = "返回码")
+    @ApiModelProperty (value = "返回码")
     private Integer code;
 
-    @ApiModelProperty(value = "返回消息")
+    @ApiModelProperty (value = "返回消息")
     private String message;
 
-    @ApiModelProperty(value = "返回数据")
-    private Map<String, Object> data = new HashMap<String, Object>();
+    @ApiModelProperty (value = "返回数据")
+    private Map<String, Object> data = new HashMap<>();
 
     //把构造方法私有
-    private R() {}
+    private R() {
+    }
 
     //成功静态方法
     public static R success() {

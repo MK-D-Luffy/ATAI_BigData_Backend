@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -70,7 +71,7 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
 
     @Override
     public TeamCompetition[] getTeamCompetition(String compentitionId, String teamId) {
-        //        调用mapper接口方法
+        // 调用mapper接口方法
         TeamCompetition[] teamCompetition = baseMapper.getMapperByTeamidCompetitionId(compentitionId, teamId);
         return teamCompetition;
     }
@@ -135,5 +136,11 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
     public List<MyCompentition> getMyCompetitionList(String userId) {
         List<MyCompentition> data = baseMapper.getMyCompetitionList(userId);
         return data;
+    }
+
+    @Override
+    public Set<String> searchTeamsByKey(String compentitionId, String key) {
+        Set<String> teams = baseMapper.searchTeamsByKey(compentitionId, key);
+        return teams;
     }
 }

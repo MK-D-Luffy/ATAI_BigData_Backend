@@ -1,6 +1,5 @@
 package com.atai.eduucenter.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.atai.commonutils.result.ResultCodeEnum;
 import com.atai.commonutils.util.FormUtils;
 import com.atai.commonutils.util.JwtInfo;
@@ -12,8 +11,9 @@ import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
 import com.atai.eduucenter.mapper.UcenterMemberMapper;
 import com.atai.eduucenter.service.UcenterMemberService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atai.servicebase.exceptionhandler.MSException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -69,7 +69,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         info.setNickname(member.getNickname());
         info.setAvatar(member.getAvatar());
 
-        String jwtToken = JwtUtils.getJwtToken(info, 1800);
+        String jwtToken = JwtUtils.getJwtToken(info, 604800);
 
         return jwtToken;
     }
@@ -160,9 +160,9 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         member.setMobile(mobile);
         member.setEmail(email);
         member.setNickname(nickname);
-        member.setPassword(MD5.encrypt(password));//密码需要j进行MD5加密
+        member.setPassword(MD5.encrypt(password));//密码需要进行MD5加密
         member.setIsDisabled(false);//用户不禁用
-        member.setAvatar("https://guli-file-191125.oss-cn-beijing.aliyuncs.com/avatar/default.jpg");
+        member.setAvatar("https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png");
         baseMapper.insert(member);
     }
 

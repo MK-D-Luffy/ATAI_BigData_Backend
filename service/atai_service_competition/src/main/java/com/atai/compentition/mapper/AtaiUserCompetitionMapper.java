@@ -6,9 +6,9 @@ import com.atai.compentition.entity.vo.RankingQuery;
 import com.atai.compentition.entity.vo.TeamCompetition;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -35,4 +35,6 @@ public interface AtaiUserCompetitionMapper extends BaseMapper<AtaiUserCompetitio
     List<RankingQuery> getMapperRanking(String compentitionId);
 
     List<MyCompentition> getMyCompetitionList(String userId);
+
+    Set<String> searchTeamsByKey(String compentitionId, String key);
 }

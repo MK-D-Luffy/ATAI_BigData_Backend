@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -37,4 +38,6 @@ public interface AtaiUserCompetitionService extends IService<AtaiUserCompetition
     List<RankingQuery> getRanking(String compentitionId);
 
     List<MyCompentition> getMyCompetitionList(String userId);
+
+    Set<String> searchTeamsByKey(String compentitionId, String key);
 }
