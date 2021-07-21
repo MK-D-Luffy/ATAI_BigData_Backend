@@ -9,15 +9,15 @@ import java.util.Date;
 
 @Data
 public class RankingQuery {
-    @ApiModelProperty(value = "团队名称")
+    @ApiModelProperty (value = "团队名称")
     private String teamName;
 
-    @ApiModelProperty(value = "分数")
-    private Integer score;
+    @ApiModelProperty (value = "分数")
+    private Double score;
 
-    @ApiModelProperty(value = "最优日期提交日")
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty (value = "最优日期提交日")
+    @JsonFormat (timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat (pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deadline;
 
 }

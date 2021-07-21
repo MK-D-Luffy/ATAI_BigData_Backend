@@ -12,26 +12,26 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.2.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.atai</groupId>
     <artifactId>ATAI_BigData_Backend</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>ATAI_BigData_Backend</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
-        <ATAI.version>0.0.1-SNAPSHOT</ATAI.version>
+        <ATAI.version>1.0</ATAI.version>
         <mybatis-plus.version>3.0.7</mybatis-plus.version>
-<!--        <mybatis-plus.version>3.0.5</mybatis-plus.version>-->
+        <!--        <mybatis-plus.version>3.0.5</mybatis-plus.version>-->
         <velocity.version>2.0</velocity.version>
         <swagger.version>2.7.0</swagger.version>
         <aliyun.oss.version>3.1.0</aliyun.oss.version>
-<!--        <aliyun.oss.version>2.8.3</aliyun.oss.version>-->
+        <!--        <aliyun.oss.version>2.8.3</aliyun.oss.version>-->
         <jodatime.version>2.10.1</jodatime.version>
         <poi.version>3.17</poi.version>
         <commons-fileupload.version>1.3.1</commons-fileupload.version>
@@ -39,7 +39,7 @@
         <httpclient.version>4.5.1</httpclient.version>
         <jwt.version>0.7.0</jwt.version>
         <aliyun-java-sdk-core.version>4.3.3</aliyun-java-sdk-core.version>
-<!--        <aliyun-sdk-oss.version>3.1.0</aliyun-sdk-oss.version>-->
+        <!--        <aliyun-sdk-oss.version>3.1.0</aliyun-sdk-oss.version>-->
         <aliyun-java-sdk-vod.version>2.15.2</aliyun-java-sdk-vod.version>
         <aliyun-java-vod-upload.version>1.4.11</aliyun-java-vod-upload.version>
         <aliyun-sdk-vod-upload.version>1.4.11</aliyun-sdk-vod-upload.version>
@@ -48,9 +48,10 @@
         <json.version>20170516</json.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <canal.client.version>1.1.0</canal.client.version>
+        <devtools.version>2.2.1.RELEASE</devtools.version>
         <docker.image.prefix>zx</docker.image.prefix>
         <cloud-alibaba.version>0.2.2.RELEASE</cloud-alibaba.version>
-<!--        <cloud-alibaba.version>2.2.5.RELEASE</cloud-alibaba.version>-->
+        <!--        <cloud-alibaba.version>2.2.5.RELEASE</cloud-alibaba.version>-->
     </properties>
 
     <dependencyManagement>
@@ -67,7 +68,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-<!--                <version>0.9.0.RELEASE</version>-->
+                <!--                <version>0.9.0.RELEASE</version>-->
                 <version>${cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -168,11 +169,11 @@
                 <version>${aliyun-java-sdk-core.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.aliyun.oss</groupId>-->
-<!--                <artifactId>aliyun-sdk-oss</artifactId>-->
-<!--                <version>${aliyun-sdk-oss.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.aliyun.oss</groupId>-->
+            <!--                <artifactId>aliyun-sdk-oss</artifactId>-->
+            <!--                <version>${aliyun-sdk-oss.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>com.aliyun</groupId>
@@ -211,34 +212,39 @@
                 <artifactId>canal.client</artifactId>
                 <version>${canal.client.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <version>${devtools.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--        &lt;!&ndash; 项目打包时会将java目录中的*.xml文件也进行打包 &ndash;&gt;-->
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--                <filtering>false</filtering>-->
-<!--            </resource>-->
-<!--        </resources>-->
-<!--    </build>-->
+    <!--    <build>-->
+    <!--        <plugins>-->
+    <!--            <plugin>-->
+    <!--                <groupId>org.springframework.boot</groupId>-->
+    <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+    <!--            </plugin>-->
+    <!--        </plugins>-->
+    <!--        &lt;!&ndash; 项目打包时会将java目录中的*.xml文件也进行打包 &ndash;&gt;-->
+    <!--        <resources>-->
+    <!--            <resource>-->
+    <!--                <directory>src/main/java</directory>-->
+    <!--                <includes>-->
+    <!--                    <include>**/*.xml</include>-->
+    <!--                </includes>-->
+    <!--                <filtering>false</filtering>-->
+    <!--            </resource>-->
+    <!--        </resources>-->
+    <!--    </build>-->
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.2.1.RELEASE</version>
                 <executions>
                     <execution>
                         <goals>
@@ -251,15 +257,23 @@
                 </configuration>
             </plugin>
         </plugins>
-             <resources>
-                 <resource>
-                      <directory>src/main/java</directory>
-                      <includes>
-                          <include>**/*.xml</include>
-                     </includes>
-                      <filtering>false</filtering>
-                  </resource>
-           </resources>
+        <resources>
+            <!--将xml文件进行打包-->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <!--将项目配置文件也进行打包-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <repositories>

@@ -21,23 +21,23 @@ import java.util.Set;
  */
 public interface AtaiUserCompetitionService extends IService<AtaiUserCompetition> {
 
-    AtaiUserCompetition getByUseridCompetitionId(String userId, String compentitionId);
+    AtaiUserCompetition getByUseridCompetitionId(String userId, String competitionId);
 
-    boolean insertByUseridCompetitionId(String id,String userId, String compentitionId, String team_name, String team_id,Date date);
+    boolean insertByUseridCompetitionId(String id, String userId, String competitionId, String team_name, String team_id, Date date);
 
-    boolean deleteByUseridCompetitionId(String userId, String compentitionId);
+    boolean deleteByUseridCompetitionId(String userId, String competitionId);
 
     String getMax();
 
-    TeamCompetition[] getTeamCompetition(String compentitionId, String teamId);
+    TeamCompetition[] getTeamCompetition(String competitionId, String teamId);
 
     void saveResult(MultipartFile file, AtaiUserCompetitionService ataiUserCompetitionService, String userId, String competitionId);
 
-    boolean updateByUseridCompetitionId(String userId, String compentitionId, int score, Date date);
+    boolean updateByUseridCompetitionId(String userId, String competitionId, double score, Date date, int submitCounts);
 
-    List<RankingQuery> getRanking(String compentitionId);
+    List<RankingQuery> getRanking(String competitionId);
 
     List<MyCompentition> getMyCompetitionList(String userId);
 
-    Set<String> searchTeamsByKey(String compentitionId, String key);
+    Set<String> searchTeamsByKey(String competitionId, String key);
 }

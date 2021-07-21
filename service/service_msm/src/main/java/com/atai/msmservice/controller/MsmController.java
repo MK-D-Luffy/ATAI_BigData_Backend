@@ -9,7 +9,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,25 +32,25 @@ public class MsmController {
     //发送邮件的方法
     @ApiOperation(value = "发送邮件")
     @GetMapping("sendByEmail/{email}")
-    public R sendEmail(@PathVariable String email){
+    public R sendEmail(@PathVariable String email) {
         //1 从redis获取验证码，如果获取到直接返回
         String code = redisTemplate.opsForValue().get(email);
-        if(!StringUtils.isEmpty(code)) {
+        if (!StringUtils.isEmpty(code)) {
             return R.success();
         }
 
         //2 如果redis获取 不到，进行邮件发送
         //生成随机值
         code = RandomUtil.getFourBitRandom();
-        Map<String,Object> param = new HashMap<>();
-        param.put("code",code);
+        Map<String, Object> param = new HashMap<>();
+        param.put("code", code);
         String senderName = "ATAIEmail";
-        String subject = "ATAI大数据竞赛平台用户注册";
-        String content = "本次验证码为:"+code+",验证码有效时间为5分钟。";
+        String subject = "ATAI大数据竞赛平台";
+        String content = "本次验证码为:" + code + ",验证码有效时间为5分钟。";
         //调用s发送邮件的方法
         try {
-            SendMail.senEmail(email,senderName,email,subject,content);
-            redisTemplate.opsForValue().set(email,code,5, TimeUnit.MINUTES);
+            SendMail.senEmail(email, senderName, email, subject, content);
+            redisTemplate.opsForValue().set(email, code, 5, TimeUnit.MINUTES);
             return R.success();
         } catch (Exception e) {
             e.printStackTrace();

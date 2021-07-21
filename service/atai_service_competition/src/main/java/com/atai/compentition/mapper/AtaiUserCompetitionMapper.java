@@ -24,7 +24,7 @@ public interface AtaiUserCompetitionMapper extends BaseMapper<AtaiUserCompetitio
 
     Boolean insertMapperByUseridCompetitionId(String id, String userId, String compentitionId, String teamId,String teamName,Date date);
 
-    Boolean updateMapperByUseridCompetitionId(String userId, String compentitionId, int score, Date date);
+    Boolean updateMapperByUseridCompetitionId(String userId, String compentitionId, double score, Date date, int submitCounts);
 
     Boolean deleteMapperByUseridCompetitionId(String userId, String compentitionId);
 

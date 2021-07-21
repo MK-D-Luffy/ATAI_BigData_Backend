@@ -1,10 +1,10 @@
 package com.atai.eduucenter.service;
 
 import com.atai.eduucenter.entity.UcenterMember;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.atai.eduucenter.entity.vo.ChangeVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * 会员表 服务类
@@ -27,4 +27,7 @@ public interface UcenterMemberService extends IService<UcenterMember> {
 
     //更改密码
     void changePasswd(ChangeVo changeVo);
+
+    //根据邮箱或手机号获取验证码
+    String getValidateCodeByEmailOrMobile(String emailOrMobile);
 }

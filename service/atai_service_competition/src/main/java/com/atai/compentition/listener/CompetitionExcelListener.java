@@ -2,6 +2,7 @@ package com.atai.compentition.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
+import com.atai.compentition.entity.AtaiUserCompetition;
 import com.atai.compentition.entity.excel.CompeletionResult;
 import com.atai.compentition.service.AtaiUserCompetitionService;
 import com.atai.servicebase.exceptionhandler.MSException;
@@ -64,7 +65,10 @@ public class CompetitionExcelListener extends AnalysisEventListener<CompeletionR
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
         Date date = new Date(System.currentTimeMillis());
 //        String s = formatter.format(date);
-        Boolean flag = ataiUserCompetitionService.updateByUseridCompetitionId(userId, competitionId, score, date);
+        AtaiUserCompetition ataiUserCompetition = ataiUserCompetitionService.getByUseridCompetitionId(userId, competitionId);
+        Integer submitCounts = ataiUserCompetition.getSubmitCounts();
+        submitCounts--;
+        Boolean flag = ataiUserCompetitionService.updateByUseridCompetitionId(userId, competitionId, score, date, submitCounts);
         System.out.println(flag);
     }
 }

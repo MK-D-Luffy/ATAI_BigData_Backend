@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
                 List resList = (List) resData.getData().get("resList");
                 BufferedReader br = new BufferedReader(new InputStreamReader(in));
                 String line;
-                int score = 0;
+                double score = 0;
                 for (int i = 0; i < resList.size(); i++) {
                     if ((line = br.readLine()) != null) {
                         System.out.println("line = " + line);
@@ -110,9 +111,19 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
                         break;
                     }
                 }
-                int newScore = (score * 100) / resList.size();
-                Date date = new Date(System.currentTimeMillis());
-                ataiUserCompetitionService.updateByUseridCompetitionId(userId, competitionId, newScore, date);
+                double newScore = (score / resList.size()) * 100.00;
+                BigDecimal format = new BigDecimal(newScore);
+                newScore = format.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                AtaiUserCompetition ataiUserCompetition = ataiUserCompetitionService.getByUseridCompetitionId(userId, competitionId);
+                double oldScore = ataiUserCompetition.getScore();
+                Date date = ataiUserCompetition.getDeadline();
+                //如果得分更高,则更新成绩提交时间
+                if (newScore > oldScore) {
+                    date = new Date(System.currentTimeMillis());
+                }
+                Integer submitCounts = ataiUserCompetition.getSubmitCounts();
+                submitCounts--;
+                ataiUserCompetitionService.updateByUseridCompetitionId(userId, competitionId, newScore, date, submitCounts);
                 br.close();
             }
         } catch (Exception e) {
@@ -121,8 +132,8 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
     }
 
     @Override
-    public boolean updateByUseridCompetitionId(String userId, String compentitionId, int score, Date date) {
-        Boolean flag = baseMapper.updateMapperByUseridCompetitionId(userId, compentitionId, score, date);
+    public boolean updateByUseridCompetitionId(String userId, String compentitionId, double score, Date date, int submitCounts) {
+        Boolean flag = baseMapper.updateMapperByUseridCompetitionId(userId, compentitionId, score, date, submitCounts);
         return flag;
     }
 

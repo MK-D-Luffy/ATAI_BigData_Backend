@@ -1,11 +1,11 @@
 package com.atai.eduucenter.controller;
 
 
+import com.atai.commonutils.ordervo.UcenterMemberOrder;
+import com.atai.commonutils.result.R;
 import com.atai.commonutils.result.ResultCodeEnum;
 import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
-import com.atai.commonutils.result.R;
-import com.atai.commonutils.ordervo.UcenterMemberOrder;
 import com.atai.eduucenter.entity.UcenterMember;
 import com.atai.eduucenter.entity.vo.ChangeVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
@@ -91,7 +91,6 @@ public class UcenterMemberController {
     @ApiOperation(value = "根据用户id获取用户信息 个人中心用")
     @PostMapping("getUserInfo/{id}")
     public R getUserInfo(@PathVariable String id) {
-  //  public UcenterMemberOrder getUserInfoOrder(@PathVariable String id) {
         UcenterMember member = ucenterMemberService.getById(id);
         //把member对象里面值复制给UcenterMemberOrder对象
         UcenterMemberOrder ucenterMemberOrder = new UcenterMemberOrder();
@@ -113,10 +112,18 @@ public class UcenterMemberController {
     }
 
     //查询某天注册人数
-    @ApiOperation(value = "查询某天注册人数")
-    @GetMapping("countRegister/{day}")
-    public R countRegister(@PathVariable String day){
+    @ApiOperation (value = "查询某天注册人数")
+    @GetMapping ("countRegister/{day}")
+    public R countRegister(@PathVariable String day) {
         Integer count = ucenterMemberService.countRegisterDay(day);
-        return R.success().data("countRegister",count);
+        return R.success().data("countRegister", count);
+    }
+
+    //根据邮箱或手机号获取验证码
+    @ApiOperation (value = "根据邮箱或手机号获取验证码")
+    @GetMapping ("getValidateCode/{emailOrMobile}")
+    public R getValidateCode(@PathVariable String emailOrMobile) {
+        String code = ucenterMemberService.getValidateCodeByEmailOrMobile(emailOrMobile);
+        return R.success().data("code", code);
     }
 }

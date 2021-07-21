@@ -14,7 +14,6 @@ import com.atai.eduucenter.service.UcenterMemberService;
 import com.atai.servicebase.exceptionhandler.MSException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -186,35 +185,47 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     public void changePasswd(ChangeVo changeVo) {
         //获取注册的数据 校验参数
         String code = changeVo.getCode(); //验证码
-        String mobile = changeVo.getMobile(); //手机号
+        String email = changeVo.getEmail(); //手机号
         String password = changeVo.getPassword(); //密码
 
         //非空判断
-        if(StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)
+        if (StringUtils.isEmpty(email) || StringUtils.isEmpty(password)
                 || StringUtils.isEmpty(code)) {
-            throw new MSException(20001,"修改密码失败！");
+            throw new MSException(20001, "修改密码失败！");
         }
 
         //判断验证码
         //获取redis验证码
-        String redisCode = redisTemplate.opsForValue().get(mobile);
-        if(!code.equals(redisCode)){
-            throw new MSException(20001,"验证🐎有误！修改密码失败！");
-        }
+//        String redisCode = redisTemplate.opsForValue().get(mobile);
+//        if(!code.equals(redisCode)){
+//            throw new MSException(20001,"验证🐎有误！修改密码失败！");
+//        }
 
-        UcenterMember ucenterMember = new UcenterMember();
-        BeanUtils.copyProperties(changeVo,ucenterMember);
-        int update = baseMapper.updateById(ucenterMember);
-        if(update == 0) {
-            throw new MSException(20001,"修改密码失败");
-        }
+//        UcenterMember ucenterMember = new UcenterMember();
+//        BeanUtils.copyProperties(changeVo,ucenterMember);
+//        System.out.println("ucenterMember = " + ucenterMember);
+
+        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
+        wrapper.eq("email", email);
+        UcenterMember member = baseMapper.selectOne(wrapper);
+
+//        int update = baseMapper.updateById(ucenterMember);
+//        if(update == 0) {
+//            throw new MSException(20001,"修改密码失败");
+//        }
 
         //数据添加数据库中
-        UcenterMember member = new UcenterMember();
-        member.setMobile(mobile);
+//        UcenterMember member = new UcenterMember();
+//        member.setEmail(email);
         member.setPassword(MD5.encrypt(password));//密码需要进行MD5加密
         baseMapper.updateById(member);
 
 
+    }
+
+    //根据邮箱和手机号获取验证码
+    @Override
+    public String getValidateCodeByEmailOrMobile(String emailOrMobile) {
+        return redisTemplate.opsForValue().get(emailOrMobile);
     }
 }

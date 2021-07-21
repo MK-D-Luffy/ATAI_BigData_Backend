@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -50,8 +49,8 @@ public class AtaiUserCompetitionController {
 
     //1.根据比赛id，token(用户id)查询信息
     @ApiOperation (value = "根据比赛id，用户id查询信息")
-    @GetMapping ("getUserCompetition/{compentitionId}")
-    public R getUserCompetition(@PathVariable String compentitionId, HttpServletRequest request) {
+    @GetMapping ("getUserCompetition/{competitionId}")
+    public R getUserCompetition(@PathVariable String competitionId, HttpServletRequest request) {
         JwtInfo jwtToken = null;
         try {
             jwtToken = JwtUtils.getMemberIdByJwtToken(request);
@@ -63,16 +62,16 @@ public class AtaiUserCompetitionController {
         }
         String userId = jwtToken.getId();
 
-        AtaiUserCompetition ataiUserCompetition = ataiUserCompetitionService.getByUseridCompetitionId(userId, compentitionId);
+        AtaiUserCompetition ataiUserCompetition = ataiUserCompetitionService.getByUseridCompetitionId(userId, competitionId);
         return R.success().data("userCompetition", ataiUserCompetition);
     }
 
     //2.根据比赛id，团队id查询信息
     @ApiOperation (value = "根据比赛id，团队id查询信息")
-    @GetMapping ("getUserCompetition/{compentitionId}/{teamId}")
-    public R getTeamCompetition(@PathVariable String compentitionId, @PathVariable String teamId) {
+    @GetMapping ("getTeamCompetition/{competitionId}/{teamId}")
+    public R getTeamCompetition(@PathVariable String competitionId, @PathVariable String teamId) {
         //1.查信息userId,teamName,score,deadline
-        TeamCompetition[] teamCompetition = ataiUserCompetitionService.getTeamCompetition(compentitionId, teamId);
+        TeamCompetition[] teamCompetition = ataiUserCompetitionService.getTeamCompetition(competitionId, teamId);
         UcenterMemberOrder[] tmp = new UcenterMemberOrder[teamCompetition.length];//用户信息
         int index = 0;
         //2.查队友列表
@@ -91,8 +90,6 @@ public class AtaiUserCompetitionController {
     @ApiOperation (value = "插入团队id，团队名称")
     @PostMapping ("insertUserCompetition")
     public R insertUserCompetition(@RequestBody AtaiUserCompetition ataiUserCompetition, HttpServletRequest request) {
-//        int id =  Integer.parseInt(ataiUserCompetitionService.getMax())+1;
-        AtaiUserCompetition ataiUserCompetition1 = new AtaiUserCompetition();
         JwtInfo jwtToken = null;
         try {
             jwtToken = JwtUtils.getMemberIdByJwtToken(request);
@@ -103,16 +100,14 @@ public class AtaiUserCompetitionController {
             return R.error().code(28004).message("登录已过期，请重新登录");
         }
         String userId = jwtToken.getId();
-        String compentitionId = ataiUserCompetition.getCompentitionId();
-        String team_name = ataiUserCompetition.getTeamName();
-        String team_id = String.valueOf(team_name.hashCode());
-        Date date = new Date(System.currentTimeMillis());
-        ataiUserCompetition1.setUserId(userId).setCompentitionId(compentitionId)
-                .setTeamId(team_id).setTeamName(team_name);
-        boolean flag = ataiUserCompetitionService.save(ataiUserCompetition1);
-//        boolean flag = ataiUserCompetitionService.insertByUseridCompetitionId(id+"",userId,compentitionId,team_name,team_id,date);
+        String teamName = ataiUserCompetition.getTeamName();
+        String teamId = String.valueOf(teamName.hashCode());
+        ataiUserCompetition
+                .setUserId(userId)
+                .setTeamId(teamId);
+        boolean flag = ataiUserCompetitionService.save(ataiUserCompetition);
         if (flag) {
-            return R.success().data("teamId", team_id);
+            return R.success().data("teamId", teamId);
         } else {
             return R.error();
         }
@@ -123,8 +118,8 @@ public class AtaiUserCompetitionController {
     @PostMapping ("deleteUserCompetition")
     public R deleteUserCompetition(@RequestBody AtaiUserCompetition ataiUserCompetition) {
         String userId = ataiUserCompetition.getUserId();
-        String compentitionId = ataiUserCompetition.getCompentitionId();
-        boolean flag = ataiUserCompetitionService.deleteByUseridCompetitionId(userId, compentitionId);
+        String competitionId = ataiUserCompetition.getCompentitionId();
+        boolean flag = ataiUserCompetitionService.deleteByUseridCompetitionId(userId, competitionId);
         if (flag) {
             return R.success();
         } else {
@@ -134,15 +129,15 @@ public class AtaiUserCompetitionController {
 
     //5.更新分数，最优日期提交日,获取上传过来文件，把文件内容读取出来,算分
     @ApiOperation (value = "更新分数，最优日期提交日")
-    @PostMapping ("saveResult/{compentitionId}/{userId}")
+    @PostMapping ("saveResult/{competitionId}/{userId}")
     public R saveResult(MultipartFile file,
                         @ApiParam (value = "包含比赛id", required = true)
-                        @PathVariable String compentitionId,
+                        @PathVariable String competitionId,
                         @ApiParam (value = "用户id", required = true)
                         @PathVariable String userId) {
         try {
             //根据上传的文件算出得分
-            ataiUserCompetitionService.saveResult(file, ataiUserCompetitionService, userId, compentitionId);
+            ataiUserCompetitionService.saveResult(file, ataiUserCompetitionService, userId, competitionId);
             return R.success().message("上传成功");
         } catch (Exception e) {
             return R.error().code(20001).message("上传失败");
@@ -152,14 +147,14 @@ public class AtaiUserCompetitionController {
 
     //6.根据比赛id，查询根据比赛id，token(用户id)查询信息
     @ApiOperation (value = "根据比赛id，查询所有的排名")
-    @GetMapping ("getRanking/{compentitionId}")
-    public R getRanking(@PathVariable String compentitionId) {
-        List<RankingQuery> ranking = ataiUserCompetitionService.getRanking(compentitionId);
+    @GetMapping ("getRanking/{competitionId}")
+    public R getRanking(@PathVariable String competitionId) {
+        List<RankingQuery> ranking = ataiUserCompetitionService.getRanking(competitionId);
         List<RankingQuery> ranking1 = new ArrayList<>();
         List<String> checkContains = new ArrayList<>();
         int count = 0;
         for (RankingQuery r : ranking) {
-            if (r.getTeamName() == "") {
+            if ("".equals(r.getTeamName())) {
                 count++;
                 return R.success().data("ranking", count);
             }
@@ -168,20 +163,14 @@ public class AtaiUserCompetitionController {
                 ranking1.add(r);
             }
         }
-//        RankingQuery[] result ;
-//        //处理，相同队伍取最大
-//        //遍历一次取出最大的那个，第一个出现的记录，后续出现的在记录中的为小值，删去即可
-//        for(RankingQuery rq:ranking){
-//             rq
-//        }
         return R.success().data("ranking", ranking1);
     }
 
     // 根据姓名获取排名
     @ApiOperation (value = "根据比赛id，团队名，查询该团队的排名")
-    @GetMapping ("getRanking/{compentitionId}/{teamName}")
-    public R getRank(@PathVariable String compentitionId, @PathVariable String teamName) {
-        List<RankingQuery> ranking = ataiUserCompetitionService.getRanking(compentitionId);
+    @GetMapping ("getRanking/{competitionId}/{teamName}")
+    public R getRank(@PathVariable String competitionId, @PathVariable String teamName) {
+        List<RankingQuery> ranking = ataiUserCompetitionService.getRanking(competitionId);
         int count = 0;
         for (RankingQuery r : ranking) {
             count++;
@@ -213,9 +202,9 @@ public class AtaiUserCompetitionController {
 
     //通过key查询团队
     @ApiOperation (value = "根据比赛id，获取包含key的团队名")
-    @GetMapping ("searchTeams/{compentitionId}/{key}")
-    public R searchTeams(@PathVariable String compentitionId, @PathVariable (required = false) String key) {
-        Set<String> teams = ataiUserCompetitionService.searchTeamsByKey(compentitionId, key);
+    @GetMapping ("searchTeams/{competitionId}/{key}")
+    public R searchTeams(@PathVariable String competitionId, @PathVariable (required = false) String key) {
+        Set<String> teams = ataiUserCompetitionService.searchTeamsByKey(competitionId, key);
         return R.success().data("teams", teams);
     }
 

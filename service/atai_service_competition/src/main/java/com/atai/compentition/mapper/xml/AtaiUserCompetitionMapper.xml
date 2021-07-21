@@ -3,31 +3,55 @@
 <mapper namespace="com.atai.compentition.mapper.AtaiUserCompetitionMapper">
     <!--sql语句：根据比赛id，用户id查询信息-->
     <select id="getMapperByUseridCompetitionId" resultType="com.atai.compentition.entity.AtaiUserCompetition">
-        SELECT * FROM atai_user_competition WHERE user_id=#{userId} AND compentition_id=#{compentitionId}
+        SELECT *
+        FROM atai_user_competition
+        WHERE user_id = #{userId}
+          AND compentition_id = #{compentitionId}
     </select>
     <!--sql语句：注册：根据比赛id，用户id插入团队id，团队名称-->
     <insert id="insertMapperByUseridCompetitionId" parameterType="com.atai.compentition.entity.AtaiUserCompetition">
-        INSERT INTO atai_user_competition(id,user_id,compentition_id,team_id,team_name,gmt_create,gmt_modified) VALUES(#{id},#{userId},#{compentitionId},#{teamId},#{teamName},#{date},#{date})
+        INSERT INTO atai_user_competition(id, user_id, compentition_id, team_id, team_name, gmt_create, gmt_modified)
+        VALUES (#{id}, #{userId}, #{compentitionId}, #{teamId}, #{teamName}, #{date}, #{date})
     </insert>
+
     <!--sql语句：根据比赛id，用户id更新分数，最优日期提交日-->
-    <update  id="updateMapperByUseridCompetitionId" parameterType="com.atai.compentition.entity.AtaiUserCompetition">
-        UPDATE atai_user_competition SET score=#{score},deadline=#{date}  WHERE user_id=#{userId} AND compentition_id=#{compentitionId}
-    </update >
+    <update id="updateMapperByUseridCompetitionId" parameterType="com.atai.compentition.entity.AtaiUserCompetition">
+        UPDATE atai_user_competition
+        SET score=CONVERT(#{score}, DECIMAL(10, 2)),
+            deadline=#{date},
+            submitCounts=#{submitCounts}
+        WHERE user_id = #{userId}
+          AND compentition_id = #{compentitionId}
+    </update>
+
     <!--sql语句：根据比赛id，用户id删除记录-->
-    <update  id="deleteMapperByUseridCompetitionId" parameterType="com.atai.compentition.entity.AtaiUserCompetition">
-         UPDATE atai_user_competition SET is_deleted=1 WHERE user_id=#{userId} AND compentition_id=#{compentitionId}
-    </update >
+    <update id="deleteMapperByUseridCompetitionId" parameterType="com.atai.compentition.entity.AtaiUserCompetition">
+        UPDATE atai_user_competition
+        SET is_deleted=1
+        WHERE user_id = #{userId}
+          AND compentition_id = #{compentitionId}
+    </update>
+
     <!--sql语句：最大值id-->
     <select id="getMax" resultType="String">
-        SELECT MAX(id) FROM atai_user_competition
+        SELECT MAX(id)
+        FROM atai_user_competition
     </select>
+
     <!--sql语句：根据比赛id，队伍id查询信息-->
     <select id="getMapperByTeamidCompetitionId" resultType="com.atai.compentition.entity.vo.TeamCompetition">
-        SELECT * FROM atai_user_competition WHERE team_id=#{teamId} AND compentition_id=#{compentitionId}
+        SELECT *
+        FROM atai_user_competition
+        WHERE team_id = #{teamId}
+          AND compentition_id = #{compentitionId}
     </select>
+
     <!--sql语句：根据比赛id，查询队伍分数-->
     <select id="getMapperRanking" resultType="com.atai.compentition.entity.vo.RankingQuery">
-        SELECT  team_name,score,deadline FROM atai_user_competition WHERE compentition_id=#{compentitionId} ORDER BY score DESC;
+        SELECT team_name, score, deadline
+        FROM atai_user_competition
+        WHERE compentition_id = #{compentitionId}
+        ORDER BY score DESC;
     </select>
 
     <!--sql语句：根据用户id查询比赛列表信息-->
