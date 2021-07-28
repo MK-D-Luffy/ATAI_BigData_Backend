@@ -4,6 +4,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 上传文件服务类
@@ -12,7 +13,7 @@ import java.io.IOException;
  */
 
 public interface OssService{
-    //上传头像到oss
+    //上传文件到oss
     String uploadFile(MultipartFile file,RedisTemplate redisTemplate);
 
     /**
@@ -21,5 +22,5 @@ public interface OssService{
      */
     void removeFile(String url);
 
-    String downloadOssFile(String url, RedisTemplate redisTemplate) throws IOException;
+    ArrayList<String> getFileFromOss(String url) throws IOException;
 }

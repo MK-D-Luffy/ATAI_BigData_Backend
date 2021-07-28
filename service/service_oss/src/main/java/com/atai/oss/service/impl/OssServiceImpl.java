@@ -22,10 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
- * 上传头像服务实现类
+ * 上传文件服务实现类
  *
  * @author ZengJinming
  * @time 2020-04-03
@@ -33,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class OssServiceImpl implements OssService {
+
+
     // TODO 如果是结果集将结果集上传到Redis缓存中
     // 上传文件(数据集、结果集和头像)到oss
     @Override
@@ -56,7 +57,7 @@ public class OssServiceImpl implements OssService {
             //1 在文件名称里面添加随机唯一的值  防止后面上传的覆盖之前的
             // replaceAll去掉uuid的横杠
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            // yuy76t5rew01.jpg
+            // e683f98a49f84cefa3c4adf026c152f5result.txt
             fileName = uuid + fileName;
 
             //2 把文件按照日期进行分类
@@ -79,11 +80,44 @@ public class OssServiceImpl implements OssService {
             //  https://atai-bigdata.oss-cn-beijing.aliyuncs.com/dasasdasd51as53d5125f01.jpg
             String url = "https://" + bucketName + "." + endPoint + "/" + fileName;
             // 上传保存到redis中
-            downloadOssFile(url, redisTemplate);
+            saveFileInRedis(url, redisTemplate, file);
             return url;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return e.getMessage();
+        }
+    }
+
+    // 将文件保存到redis中
+    public void saveFileInRedis(String url, RedisTemplate redisTemplate,
+                                MultipartFile file) throws IOException {
+
+        InputStream contentIs = file.getInputStream();
+
+        if (contentIs != null) {
+            if (url.endsWith(".xls") || url.endsWith(".xlsx")) {
+                // 将读取的excel内容保存到redis中
+                ExcelReader excelReader = EasyExcel.read(contentIs, ReadData.class, new ExcelListener(url, redisTemplate)).build();
+                ReadSheet readSheet = EasyExcel.readSheet(0).build();
+                excelReader.read(readSheet);
+                // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
+                excelReader.finish();
+            } else if (url.endsWith(".txt")) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(contentIs));
+                String line;
+                ArrayList<String> list = new ArrayList<>();
+                // 将读取的txt内容保存到redis中
+                BoundListOperations listOps = redisTemplate.boundListOps(url);
+                while ((line = reader.readLine()) != null) {
+                    list.add(line);
+                }
+                listOps.rightPushAll(list);
+
+                //定时任务检测过期从redis中移除
+//                redisTemplate.expire(url, 30, TimeUnit.SECONDS);
+            }
+            // 数据读取完成后，获取的流必须关闭，否则会造成连接泄漏，导致请求无连接可用，程序无法正常工作。
+            contentIs.close();
         }
     }
 
@@ -108,11 +142,13 @@ public class OssServiceImpl implements OssService {
     }
 
     @Override
-    public String downloadOssFile(String url, RedisTemplate redisTemplate) throws IOException {
+    public ArrayList<String> getFileFromOss(String url) throws IOException {
+        //读取配置信息
         String endPoint = ConstantPropertiesUtils.END_POIND;
         String accessKeyId = ConstantPropertiesUtils.ACCESS_KEY_ID;
         String accessKeySecret = ConstantPropertiesUtils.ACCESS_KEY_SECRET;
         String bucketName = ConstantPropertiesUtils.BUCKET_NAME;
+
         String host = "https://" + bucketName + "." + endPoint + "/";
         String objectName = url.substring(host.length());
 
@@ -123,32 +159,15 @@ public class OssServiceImpl implements OssService {
         // 调用ossObject.getObjectContent获取文件输入流，可读取此输入流获取其内容。
         InputStream contentIs = ossObject.getObjectContent();
 
-        if (contentIs != null) {
-            if (url.endsWith(".xls") || url.endsWith(".xlsx")) {
-                // 将读取的excel内容保存到redis中
-                ExcelReader excelReader = EasyExcel.read(contentIs, ReadData.class, new ExcelListener(url, redisTemplate)).build();
-                ReadSheet readSheet = EasyExcel.readSheet(0).build();
-                excelReader.read(readSheet);
-                // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
-                excelReader.finish();
-            } else if (url.endsWith(".txt")) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(contentIs));
-                String line;
-                ArrayList<String> list = new ArrayList<>();
-                // 将读取的txt内容保存到redis中
-                BoundListOperations listOps = redisTemplate.boundListOps(url);
-                while ((line = reader.readLine()) != null) {
-                    list.add(line);
-                }
-                listOps.rightPushAll(list);
-//                redisTemplate.expire(url, 30, TimeUnit.SECONDS);
-            }
-            // 数据读取完成后，获取的流必须关闭，否则会造成连接泄漏，导致请求无连接可用，程序无法正常工作。
-            contentIs.close();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(contentIs));
+        String line;
+        ArrayList<String> list = new ArrayList<>();
+        while ((line = reader.readLine()) != null) {
+            list.add(line);
         }
 
-        // 关闭OSSClient。
         ossClient.shutdown();
-        return null;
+
+        return list;
     }
 }

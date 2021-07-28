@@ -5,6 +5,7 @@ import com.atai.eduucenter.entity.vo.ChangeVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * 会员表 服务类
@@ -24,6 +25,12 @@ public interface UcenterMemberService extends IService<UcenterMember> {
 
     //查询某天注册人数
     Integer countRegisterDay(String day);
+
+    //判断昵称是否重复
+    Boolean checkNickname(@PathVariable String nickname);
+
+    //判断手机号是否重复
+    Boolean checkPhone(String mobile);
 
     //更改密码
     void changePasswd(ChangeVo changeVo);

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atai.competition.mapper.AtaiUserCompetitionMapper">
+    <!--sql语句：根据比赛id，用户id查询信息-->
+    <select id="getMapperByUseridCompetitionId" resultType="com.atai.competition.entity.AtaiUserCompetition">
+        SELECT *
+        FROM atai_user_competition
+        WHERE user_id = #{userId}
+        AND competition_id = #{competitionId}
+    </select>
+
+    <!--sql语句：注册：根据比赛id，用户id插入团队id，团队名称-->
+    <insert id="insertMapperByUseridCompetitionId" parameterType="com.atai.competition.entity.AtaiUserCompetition">
+        INSERT INTO atai_user_competition(id, user_id, competition_id, team_id, team_name, gmt_create, gmt_modified)
+        VALUES (#{id}, #{userId}, #{competitionId}, #{teamId}, #{teamName}, #{date}, #{date})
+    </insert>
+
+    <!--sql语句：根据比赛id，用户id更新分数，最优日期提交日-->
+    <update id="updateMapperByUseridCompetitionId" parameterType="com.atai.competition.entity.AtaiUserCompetition">
+        UPDATE atai_user_competition
+        SET score=CONVERT(#{score}, DECIMAL(10, 2)),
+        deadline=#{date},
+        submitCounts=#{submitCounts}
+        WHERE user_id = #{userId}
+        AND competition_id = #{competitionId}
+    </update>
+
+    <!--sql语句：根据比赛id，用户id删除记录-->
+    <update id="deleteMapperByUseridCompetitionId" parameterType="com.atai.competition.entity.AtaiUserCompetition">
+        UPDATE atai_user_competition
+        SET is_deleted=1
+        WHERE user_id = #{userId}
+        AND competition_id = #{competitionId}
+    </update>
+
+    <!--sql语句：最大值id-->
+    <select id="getMax" resultType="String">
+        SELECT MAX(id)
+        FROM atai_user_competition
+    </select>
+
+    <!--sql语句：根据比赛id，队伍id查询信息-->
+    <select id="getMapperByTeamidCompetitionId" resultType="com.atai.competition.entity.vo.TeamCompetition">
+        SELECT *
+        FROM atai_user_competition
+        WHERE team_id = #{teamId}
+        AND competition_id = #{competitionId}
+    </select>
+
+    <!--sql语句：根据比赛id，队伍id查询信息-->
+    <update id="updateTeamNameMapperByTeamid" parameterType="com.atai.competition.entity.vo.TeamCompetition">
+        UPDATE atai_user_competition
+        SET team_name=#{teamName}
+        WHERE team_id = #{teamId}
+    </update>
+
+    <!--sql语句：根据比赛id，查询队伍分数-->
+    <select id="getMapperRanking" resultType="com.atai.competition.entity.vo.RankingQuery">
+        SELECT um.nickname, auc.team_name, auc.score, auc.deadline
+        FROM atai_user_competition auc,
+        ucenter_member um
+        WHERE auc.competition_id = #{competitionId}
+        AND auc.user_id = um.id
+        ORDER BY score DESC;
+    </select>
+
+    <!--sql语句：根据用户id查询比赛列表信息-->
+    <select id="getMyCompetitionList" resultType="com.atai.competition.entity.frontVo.MyCompetition">
+        SELECT auc.competition_id AS id,
+        auc.team_id,
+        auc.score,
+        auc.team_name,
+        ac.`name`,
+        ac.`level`,
+        ac.`participants`,
+        ac.`deadline`,
+        ac.`money`
+        FROM `atai_user_competition` auc,
+        atai_competition ac
+        WHERE auc.`competition_id` = ac.`id`
+        AND auc.user_id = #{userId}
+    </select>
+
+    <!--sql语句：根据key查询队伍信息-->
+    <select id="searchTeamsByKey" resultType="com.atai.competition.entity.TeamName">
+        SELECT team_name
+        FROM atai_user_competition
+        WHERE competition_id = #{competitionId}
+        AND team_name like CONCAT('%', #{key}, '%')
+    </select>
+
+    <insert id="insertApplyMessage" parameterType="com.atai.competition.entity.AtaiApplyMsg">
+        INSERT INTO atai_apply_msg(id, competition_id, sender_id, receive_id)
+        VALUES (#{id}, #{competitionId}, #{senderId}, #{receiveId})
+    </insert>
+
+    <select id="selectSenders" resultType="com.atai.competition.entity.AtaiApplyMsg">
+        SELECT aam.`id`, aam.`sender_id`, aam.`receive_id`, um.`nickname` sender_name
+        FROM `atai_apply_msg` aam,
+        atai.ucenter_member um
+        WHERE aam.`sender_id` = um.`id`
+        AND aam.`competition_id` = #{competitionId}
+        AND aam.`receive_id` = #{receiveId}
+    </select>
+
+    <delete id="deleteApplyMsg">
+        delete
+        from atai_apply_msg
+        where sender_id = #{param1}
+        and competition_id = #{param2}
+    </delete>
+</mapper>
+

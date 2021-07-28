@@ -23,12 +23,13 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 会员表 前端控制器
+ *
  * @author ZengJinming
  * @since 2020-04-09
  */
-@Api(description="登录和注册")
+@Api (description = "登录和注册")
 @RestController
-@RequestMapping("/eduucenter/ucenter-member")
+@RequestMapping ("/eduucenter/ucenter-member")
 @Slf4j
 //@CrossOrigin
 public class UcenterMemberController {
@@ -36,33 +37,49 @@ public class UcenterMemberController {
     UcenterMemberService ucenterMemberService;
 
     //登录
-    @ApiOperation(value = "会员登录")
-    @PostMapping("login")
-    public R login(@RequestBody LoginVo loginVo){
+    @ApiOperation (value = "会员登录")
+    @PostMapping ("login")
+    public R login(@RequestBody LoginVo loginVo) {
         String token = ucenterMemberService.login(loginVo);
         return R.success().data("token", token).message("登录成功");
     }
 
     //注册
-    @ApiOperation(value = "会员注册")
-    @PostMapping("register")
+    @ApiOperation (value = "会员注册")
+    @PostMapping ("register")
     public R registerUser(@RequestBody RegisterVo registerVo) {
         ucenterMemberService.register(registerVo);
         return R.success().message("注册成功");
     }
 
+    //判断昵称是否重复
+    @ApiOperation (value = "判断昵称是否重复(返回true为重复)")
+    @GetMapping ("checkNickname/{nickname}")
+    public R checkNickname(@PathVariable String nickname) {
+        Boolean flag = ucenterMemberService.checkNickname(nickname);
+        return R.success().data("flag", flag);
+    }
+
+    //判断手机号是否重复
+    @ApiOperation (value = "判断手机号是否重复(返回true为重复)")
+    @GetMapping ("checkPhone/{mobile}")
+    public R checkPhone(@PathVariable String mobile) {
+        Boolean flag = ucenterMemberService.checkPhone(mobile);
+        return R.success().data("flag", flag);
+    }
+
     //更改密码
-    @ApiOperation(value = "更改密码")
-    @PostMapping("change")
+    @ApiOperation (value = "更改密码")
+    @PostMapping ("change")
     public R changePassword(@RequestBody ChangeVo changeVo) {
         ucenterMemberService.changePasswd(changeVo);
         return R.success().message("修改密码成功");
     }
 
     //根据token获取用户信息
-    @ApiOperation(value = "根据token获取登录信息")
-    @GetMapping("getMemberInfo")
-    public R getLoginInfo(HttpServletRequest request){
+    @ApiOperation (value = "根据token获取登录信息")
+    @GetMapping ("getMemberInfo")
+    public R getLoginInfo(HttpServletRequest request) {
 
         try {
             //调用jwt工具类的方法。根据request对象获取头信息，返回用户id
@@ -75,36 +92,36 @@ public class UcenterMemberController {
     }
 
     //根据用户id获取用户信息
-    @ApiOperation(value = "根据用户id获取用户信息 课程评论用")
-    @PostMapping("getUserInfoOrder/{id}")
+    @ApiOperation (value = "根据用户id获取用户信息 课程评论用")
+    @PostMapping ("getUserInfoOrder/{id}")
 //    public R getUserInfoOrder(@PathVariable String id) {
     public UcenterMemberOrder getUserInfoOrder(@PathVariable String id) {
         UcenterMember member = ucenterMemberService.getById(id);
         //把member对象里面值复制给UcenterMemberOrder对象
         UcenterMemberOrder ucenterMemberOrder = new UcenterMemberOrder();
-        BeanUtils.copyProperties(member,ucenterMemberOrder);
+        BeanUtils.copyProperties(member, ucenterMemberOrder);
         return ucenterMemberOrder;
 //        return R.success().data("memberInfo",ucenterMemberOrder);
     }
 
     //根据用户id获取用户信息
-    @ApiOperation(value = "根据用户id获取用户信息 个人中心用")
-    @PostMapping("getUserInfo/{id}")
+    @ApiOperation (value = "根据用户id获取用户信息 个人中心用")
+    @PostMapping ("getUserInfo/{id}")
     public R getUserInfo(@PathVariable String id) {
         UcenterMember member = ucenterMemberService.getById(id);
         //把member对象里面值复制给UcenterMemberOrder对象
         UcenterMemberOrder ucenterMemberOrder = new UcenterMemberOrder();
-        BeanUtils.copyProperties(member,ucenterMemberOrder);
- //       return ucenterMemberOrder;
-        return R.success().data("memberInfo",ucenterMemberOrder);
+        BeanUtils.copyProperties(member, ucenterMemberOrder);
+        //       return ucenterMemberOrder;
+        return R.success().data("memberInfo", ucenterMemberOrder);
     }
 
     //用户信息修改功能
-    @ApiOperation(value = "用户信息修改")
-    @PostMapping("updateMember")
+    @ApiOperation (value = "用户信息修改")
+    @PostMapping ("updateMember")
     public R updateMember(@RequestBody UcenterMember ucenterMember) {
         boolean flag = ucenterMemberService.updateById(ucenterMember);
-        if(flag) {
+        if (flag) {
             return R.success();
         } else {
             return R.error();

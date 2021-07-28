@@ -213,35 +213,17 @@
                 <version>${canal.client.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-devtools</artifactId>
-                <version>${devtools.version}</version>
-            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-devtools</artifactId>-->
+            <!--                <version>${devtools.version}</version>-->
+            <!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.springframework.boot</groupId>-->
-    <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-    <!--            </plugin>-->
-    <!--        </plugins>-->
-    <!--        &lt;!&ndash; 项目打包时会将java目录中的*.xml文件也进行打包 &ndash;&gt;-->
-    <!--        <resources>-->
-    <!--            <resource>-->
-    <!--                <directory>src/main/java</directory>-->
-    <!--                <includes>-->
-    <!--                    <include>**/*.xml</include>-->
-    <!--                </includes>-->
-    <!--                <filtering>false</filtering>-->
-    <!--            </resource>-->
-    <!--        </resources>-->
-    <!--    </build>-->
-
     <build>
         <plugins>
+            <!--配置热部署-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

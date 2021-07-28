@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 会员表 服务实现类
+ *
  * @author ZengJinming
  * @since 2020-04-09
  */
@@ -28,7 +29,7 @@ import org.springframework.util.StringUtils;
 public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, UcenterMember> implements UcenterMemberService {
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     //登录的方法
     @Override
@@ -38,9 +39,9 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         String password = loginVo.getPassword();
 
         //校验：参数是否合法
-        if(StringUtils.isEmpty(mobile)
+        if (StringUtils.isEmpty(mobile)
                 || !FormUtils.isMobile(mobile)
-                || StringUtils.isEmpty(password)){
+                || StringUtils.isEmpty(password)) {
             throw new MSException(ResultCodeEnum.PARAM_ERROR);
         }
 
@@ -48,17 +49,17 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         QueryWrapper<UcenterMember> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("mobile", mobile);
         UcenterMember member = baseMapper.selectOne(queryWrapper);
-        if(member == null){
+        if (member == null) {
             throw new MSException(ResultCodeEnum.LOGIN_MOBILE_ERROR);
         }
 
         //校验密码是否正确
-        if(!MD5.encrypt(password).equals(member.getPassword())){
+        if (!MD5.encrypt(password).equals(member.getPassword())) {
             throw new MSException(ResultCodeEnum.LOGIN_PASSWORD_ERROR);
         }
 
         //校验用户是否被禁用
-        if(member.getIsDisabled()){
+        if (member.getIsDisabled()) {
             throw new MSException(ResultCodeEnum.LOGIN_DISABLED_ERROR);
         }
 
@@ -72,49 +73,6 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
         return jwtToken;
     }
-//    @Override
-//    public String login(UcenterMember member) {
-//        //获取登录手机号和密码
-//        String mobile = member.getMobile();
-//        String password = member.getPassword();
-//
-//        //手机号和密码非空判断
-//        if(StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)) {
-//            throw new MSException(20001,"登录失败");
-//        }
-//
-//        //判断手机号是否正确
-//        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
-//        wrapper.eq("mobile",mobile);
-//        UcenterMember mobileMember = baseMapper.selectOne(wrapper);
-//        //判断查询对象是否为空
-//        if(mobileMember == null) {//没有这个手机号
-//            throw new MSException(20001,"登录失败");
-//        }
-//
-//        //判断密码
-//        //因为存储到数据库密码肯定加密的
-//        //把输入的密码进行加密，再和数据库密码进行比较
-//        //加密方式 MD5
-//        if(!MD5.encrypt(password).equals(mobileMember.getPassword())) {
-//            throw new MSException(20001,"登录失败");
-//        }
-//
-//        //判断用户是否禁用
-//        if(mobileMember.getIsDisabled()) {
-//            throw new MSException(20001,"登录失败");
-//        }
-//
-//        //登录成功
-//        //生成token字符串，使用jwt工具类
-//        JwtInfo info = new JwtInfo();
-//        info.setId(member.getId());
-//        info.setNickname(member.getNickname());
-//        info.setAvatar(member.getAvatar());
-//
-//        String jwtToken = JwtUtils.getJwtToken(info, 1800);
-//        return jwtToken;
-//    }
 
     //注册的方法
     @Override
@@ -127,31 +85,31 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         String password = registerVo.getPassword(); //密码
 
         //非空判断
-        if(StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)  || StringUtils.isEmpty(email)
+        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password) || StringUtils.isEmpty(email)
                 || StringUtils.isEmpty(code) || StringUtils.isEmpty(nickname)) {
-            throw new MSException(20001,"注册失败！");
+            throw new MSException(20001, "注册失败！");
         }
         //设置验证码
         //发生邮件
         //判断验证码
         //获取redis验证码
         String redisCode = redisTemplate.opsForValue().get(email);
-        if(!code.equals(redisCode)){
-            throw new MSException(20001,"验证🐎有误！注册失败！");
+        if (!code.equals(redisCode)) {
+            throw new MSException(20001, "验证🐎有误！注册失败！");
         }
 
         //判断手机号是否重复，表里面存在相同手机号不进行添加
         QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
-        wrapper.eq("mobile",mobile);
+        wrapper.eq("mobile", mobile);
         Integer count = baseMapper.selectCount(wrapper);
 
-        if(count > 0) {
-            throw new MSException(20001,"该手机号已注册！注册失败！");
+        if (count > 0) {
+            throw new MSException(20001, "该手机号已注册！注册失败！");
         }
-        wrapper.eq("email",email);
+        wrapper.eq("email", email);
         count = baseMapper.selectCount(wrapper);
-        if(count > 0) {
-            throw new MSException(20001,"该邮箱已注册！注册失败！");
+        if (count > 0) {
+            throw new MSException(20001, "该邮箱已注册！注册失败！");
         }
 
         //数据添加数据库中
@@ -169,7 +127,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     @Override
     public UcenterMember getOpenIdMember(String openid) {
         QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
-        wrapper.eq("openid",openid);
+        wrapper.eq("openid", openid);
         UcenterMember member = baseMapper.selectOne(wrapper);
         return member;
     }
@@ -178,6 +136,22 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     @Override
     public Integer countRegisterDay(String day) {
         return baseMapper.countRegister(day);
+    }
+
+    //判断昵称是否重复(返回true为重复)
+    @Override
+    public Boolean checkNickname(String nickname) {
+        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
+        wrapper.eq("nickname", nickname);
+        return baseMapper.selectCount(wrapper) > 0;
+    }
+
+    //判断手机号是否重复(返回true为重复)
+    @Override
+    public Boolean checkPhone(String mobile) {
+        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
+        wrapper.eq("mobile", mobile);
+        return baseMapper.selectCount(wrapper) > 0;
     }
 
     //更改密码
@@ -228,4 +202,6 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     public String getValidateCodeByEmailOrMobile(String emailOrMobile) {
         return redisTemplate.opsForValue().get(emailOrMobile);
     }
+
+
 }

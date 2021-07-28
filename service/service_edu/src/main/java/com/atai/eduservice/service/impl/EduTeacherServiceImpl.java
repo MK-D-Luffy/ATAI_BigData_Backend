@@ -26,17 +26,17 @@ public class EduTeacherServiceImpl extends ServiceImpl<EduTeacherMapper, EduTeac
     @Override
     public List<EduTeacher> selectHotTeacher() {
         QueryWrapper<EduTeacher> wrapperTeacher = new QueryWrapper<>();
-        wrapperTeacher.orderByAsc("sort");
+        wrapperTeacher.orderByDesc("sort");
         wrapperTeacher.last("limit 4");
-        List<EduTeacher> List = baseMapper.selectList(wrapperTeacher);
-        return List;
+        List<EduTeacher> list = baseMapper.selectList(wrapperTeacher);
+        return list;
     }
 
     //1 讲师页 分页查询讲师的方法
     @Override
     public Map<String, Object> getTeacherFrontList(Page<EduTeacher> pageTeacher) {
         QueryWrapper<EduTeacher> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("id");
+        wrapper.orderByDesc("sort").orderByAsc("name");
         //把分页数据封装到pageTeacher对象里去
         baseMapper.selectPage(pageTeacher,wrapper);
 
@@ -49,7 +49,7 @@ public class EduTeacherServiceImpl extends ServiceImpl<EduTeacherMapper, EduTeac
         boolean hasPrevious = pageTeacher.hasPrevious();//上一页
 
         //把分页数据获取出来，放到map集合
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(8);
         map.put("items", records);
         map.put("current", current);
         map.put("pages", pages);
