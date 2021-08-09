@@ -40,7 +40,14 @@ public class UcenterMemberController {
     @ApiOperation (value = "会员登录")
     @PostMapping ("login")
     public R login(@RequestBody LoginVo loginVo) {
-        String token = ucenterMemberService.login(loginVo);
+        String token;
+        try {
+            token = ucenterMemberService.login(loginVo);
+        } catch (MSException e) {
+            return R.error().code(e.getCode()).message(e.getMessage());
+        } catch (Exception e) {
+            return R.error().message(e.getMessage());
+        }
         return R.success().data("token", token).message("登录成功");
     }
 

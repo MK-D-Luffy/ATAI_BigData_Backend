@@ -268,13 +268,12 @@ public class AtaiUserCompetitionController {
             ataiUserCompetitionService.applyToJoinTeam(competitionId, teamName, userId);
             return R.success();
         } catch (Exception e) {
-            return R.error();
+            return R.error().message(e.getMessage());
         }
-
     }
 
-    //申请加入团队
-    @ApiOperation (value = "通过比赛id，用户id，生成随机团队名称")
+    //获取我收到的申请
+    @ApiOperation (value = "通过比赛id，用户id，获取我收到的申请")
     @GetMapping ("getSenders/{competitionId}/{receiveId}")
     public R getSenders(@PathVariable String competitionId,
                         @PathVariable String receiveId) {
@@ -284,11 +283,12 @@ public class AtaiUserCompetitionController {
 
     //接受成员加入团队
     @ApiOperation (value = "根据比赛id，用户id,接受加入团队")
-    @GetMapping ("addMember/{competitionId}/{userId}/{newTeamName}")
-    public R addMember(@PathVariable String competitionId,
-                       @PathVariable String userId,
-                       @PathVariable String newTeamName) {
-        Boolean flag = ataiUserCompetitionService.addMember(userId, competitionId, newTeamName);
+    @GetMapping ("acceptMember/{competitionId}/{senderId}/{userId}/{newTeamName}")
+    public R acceptMember(@PathVariable String competitionId,
+                          @PathVariable String senderId,
+                          @PathVariable String userId,
+                          @PathVariable String newTeamName) {
+        Boolean flag = ataiUserCompetitionService.acceptMember(competitionId, senderId, userId, newTeamName);
         if (flag) {
             return R.success();
         } else {
@@ -299,10 +299,10 @@ public class AtaiUserCompetitionController {
 
     //拒绝成员加入团队
     @ApiOperation (value = "根据比赛id，用户id,拒绝加入团队")
-    @GetMapping ("refuseMember/{competitionId}/{userId}")
+    @GetMapping ("refuseMember/{competitionId}/{senderId}")
     public R refuseMember(@PathVariable String competitionId,
-                          @PathVariable String userId) {
-        ataiUserCompetitionService.refuseMember(userId, competitionId);
+                          @PathVariable String senderId) {
+        ataiUserCompetitionService.refuseMember(senderId, competitionId);
         return R.success();
     }
 
@@ -315,5 +315,13 @@ public class AtaiUserCompetitionController {
         return R.success();
     }
 
+    //获取我的申请
+    @ApiOperation (value = "根据比赛id，申请人id,获取申请信息")
+    @GetMapping ("getReceivers/{competitionId}/{senderId}")
+    public R getReceivers(@PathVariable String competitionId,
+                          @PathVariable String senderId) {
+        List<TeamName> list = ataiUserCompetitionService.getReceivers(competitionId, senderId);
+        return R.success().data("receivers", list);
+    }
 }
 

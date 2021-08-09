@@ -6,7 +6,6 @@ import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
 import com.atai.eduservice.entity.AtaiArticle;
 import com.atai.eduservice.entity.AtaiArticleBody;
-import com.atai.eduservice.entity.EduTeacher;
 import com.atai.eduservice.entity.frontvo.ArticleContentFront;
 import com.atai.eduservice.entity.frontvo.ArticleFrontVo;
 import com.atai.eduservice.entity.frontvo.ArticlePublish;
@@ -18,11 +17,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.StringUtils;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +90,7 @@ public class AtaiArticleController {
             return R.error().code(28004).message("登录超时，重新登录");
         }
         String userId=jwtToken.getId();
-//        String userId = "1346808853676687362";
+
         //创建page对象
         Page<AtaiArticle> pageCompetition = new Page<>(current,limit);
         //构建条件

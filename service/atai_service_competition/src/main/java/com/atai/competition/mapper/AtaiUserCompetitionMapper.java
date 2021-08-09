@@ -47,4 +47,10 @@ public interface AtaiUserCompetitionMapper extends BaseMapper<AtaiUserCompetitio
     List<AtaiApplyMsg> selectSenders(String competitionId, String receiveId);
 
     void deleteApplyMsg(String userId, String competitionId);
+
+    Integer getMapperApplyCount(String competitionId, String userId);
+
+    Integer getMapperApplyTotalCount(String competitionId, String userId, String receiveId);
+
+    List<AtaiApplyMsg> selectReceivers(String competitionId, String senderId);
 }

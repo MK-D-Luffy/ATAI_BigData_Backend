@@ -19,8 +19,8 @@ public class SendMail {
     // 收件人邮箱（替换为自己知道的有效邮箱）
     public static String receiveMailAccount = "1731976958@qq.com";
 
-    public static void senEmail(String receiveMailAccount,String senderName,String reciverName,
-                                String subject,String content ) throws Exception {
+    public static void senEmail(String receiveMailAccount, String senderName, String reciverName,
+                                String subject, String content) throws Exception {
         // 1. 创建参数配置, 用于连接邮件服务器的参数配置
         Properties props = new Properties();                    // 参数配置
         props.setProperty("mail.transport.protocol", "smtp");   // 使用的协议（JavaMail规范要求）
@@ -31,7 +31,7 @@ public class SendMail {
         // 设置为debug模式, 可以查看详细的发送 log
         session.setDebug(true);
         // 3. 创建一封邮件
-        MimeMessage message = createMimeMessage(session, myEmailAccount, receiveMailAccount,senderName,reciverName,subject,content);
+        MimeMessage message = createMimeMessage(session, myEmailAccount, receiveMailAccount, senderName, reciverName, subject, content);
         // 4. 根据 Session 获取邮件传输对象
         Transport transport = session.getTransport();
         transport.connect(myEmailAccount, myEmailPassword);
@@ -111,7 +111,7 @@ public class SendMail {
      * @throws Exception
      */
     public static MimeMessage createMimeMessage(Session session, String sendMail, String receiveMail,
-        String senderName,String reciverName,String subject,String content) throws Exception {
+                                                String senderName, String reciverName, String subject, String content) throws Exception {
         // 1. 创建一封邮件
         MimeMessage message = new MimeMessage(session);
 

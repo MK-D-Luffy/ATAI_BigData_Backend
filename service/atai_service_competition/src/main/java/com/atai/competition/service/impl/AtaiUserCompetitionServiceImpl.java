@@ -172,6 +172,7 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
             wrapper2.eq("team_id", oldTeamId);
             List<AtaiUserCompetition> list = baseMapper.selectList(wrapper2);
 
+            //修改该团队所有用户的团队名和团队id
             String newTeamId = String.valueOf(newTeamName.hashCode());
             for (AtaiUserCompetition ataiUserCompetition : list) {
                 ataiUserCompetition.setTeamId(newTeamId).setTeamName(newTeamName);
@@ -187,6 +188,7 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
         wrapper.eq("competition_id", competitionId);
         wrapper.eq("user_id", userId);
 
+        //随机初始化团队名
         String newTeamName = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         String newTeamId = String.valueOf(newTeamName.hashCode());
 
@@ -201,46 +203,91 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
 
     @Override
     public void applyToJoinTeam(String competitionId, String teamName, String userId) {
+        //判断我的队伍是否已超过两人
+        AtaiUserCompetition userCompetition = baseMapper.getMapperByUseridCompetitionId(userId, competitionId);
+        String name = userCompetition.getTeamName();
+        QueryWrapper<AtaiUserCompetition> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("team_name", name);
+        Integer count = baseMapper.selectCount(wrapper1);
+        if (count > 1) {
+            throw new RuntimeException("无法申请,请您先单独成队!");
+        }
+
+        //获取接受申请队伍的管理员(level:1)
         QueryWrapper<AtaiUserCompetition> wrapper = new QueryWrapper<>();
         wrapper.eq("competition_id", competitionId);
         wrapper.eq("team_name", teamName);
         wrapper.eq("team_level", 1);
-
         AtaiUserCompetition ataiUserCompetition = baseMapper.selectOne(wrapper);
         String receiveId = ataiUserCompetition.getUserId();
 
+        Integer applyCount = baseMapper.getMapperApplyCount(competitionId, userId);
+        if (applyCount == 3) {
+            throw new RuntimeException("无法申请,最多同时申请3个队伍!");
+        }
+
+        Integer applyTotalCount = baseMapper.getMapperApplyTotalCount(competitionId, userId, receiveId);
+        if (applyTotalCount == 1) {
+            throw new RuntimeException("无法申请,请勿重复申请");
+        }
+
+        //创建申请对象
         AtaiApplyMsg ataiApplyMsg = new AtaiApplyMsg()
                 .setId(UUID.randomUUID().toString().replace("-", "").substring(0, 16))
                 .setCompetitionId(competitionId)
                 .setSenderId(userId)
                 .setReceiveId(receiveId);
 
-//        baseMapper.selectCount()
         baseMapper.insertApplyMessage(ataiApplyMsg);
     }
 
     @Override
     public List<AtaiApplyMsg> getSenders(String competitionId, String receiveId) {
+        //根据比赛id和我的id获取发送给我的申请
         return baseMapper.selectSenders(competitionId, receiveId);
     }
 
     @Override
-    public Boolean addMember(String userId, String competitionId, String newTeamName) {
-        AtaiUserCompetition ataiUserCompetition = baseMapper.getMapperByUseridCompetitionId(userId, competitionId);
+    public Boolean acceptMember(String competitionId, String senderId, String userId, String newTeamName) {
+        //获取新的队伍名
+        AtaiUserCompetition ataiUserCompetition = baseMapper.getMapperByUseridCompetitionId(senderId, competitionId);
         String newTeamId = String.valueOf(newTeamName.hashCode());
+        //将成员加入队伍中
         ataiUserCompetition
                 .setTeamName(newTeamName)
                 .setTeamId(newTeamId)
                 .setTeamLevel(0);
 
+        //删除该成员之前的所有申请信息
+        baseMapper.deleteApplyMsg(senderId, competitionId);
+
+        //删除我的申请信息
         baseMapper.deleteApplyMsg(userId, competitionId);
 
         return baseMapper.updateById(ataiUserCompetition) != 0;
     }
 
     @Override
-    public void refuseMember(String userId, String competitionId) {
-        baseMapper.deleteApplyMsg(userId, competitionId);
+    public void refuseMember(String senderId, String competitionId) {
+        //删除id为(senderId)的用户发出的申请
+        baseMapper.deleteApplyMsg(senderId, competitionId);
+    }
+
+    @Override
+    public List<TeamName> getReceivers(String competitionId, String senderId) {
+        //获取我发出的申请
+        List<AtaiApplyMsg> applyMsgs = baseMapper.selectReceivers(competitionId, senderId);
+        ArrayList<TeamName> list = new ArrayList<>();
+        for (AtaiApplyMsg applyMsg : applyMsgs) {
+            //获取被申请人的用户id
+            String receiveId = applyMsg.getReceiveId();
+            AtaiUserCompetition ataiUserCompetition = baseMapper.getMapperByUseridCompetitionId(receiveId, competitionId);
+            //根据用户id和比赛id获取比赛名称
+            String teamName = ataiUserCompetition.getTeamName();
+            //封装为对象返回
+            list.add(new TeamName().setTeamName(teamName));
+        }
+        return list;
     }
 
 }

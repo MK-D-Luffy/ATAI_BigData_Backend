@@ -1,10 +1,7 @@
 package com.atai.eduucenter.service.impl;
 
 import com.atai.commonutils.result.ResultCodeEnum;
-import com.atai.commonutils.util.FormUtils;
-import com.atai.commonutils.util.JwtInfo;
-import com.atai.commonutils.util.JwtUtils;
-import com.atai.commonutils.util.MD5;
+import com.atai.commonutils.util.*;
 import com.atai.eduucenter.entity.UcenterMember;
 import com.atai.eduucenter.entity.vo.ChangeVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
@@ -37,6 +34,12 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
         String mobile = loginVo.getMobile();
         String password = loginVo.getPassword();
+
+        try {
+            password = AESUtil.desEncrypt(password).trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //校验：参数是否合法
         if (StringUtils.isEmpty(mobile)

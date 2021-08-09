@@ -51,8 +51,9 @@ public interface AtaiUserCompetitionService extends IService<AtaiUserCompetition
 
     List<AtaiApplyMsg> getSenders(String competitionId, String receiveId);
 
-    Boolean addMember(String userId, String competitionId, String newTeamName);
+    Boolean acceptMember(String competitionId, String senderId, String userId, String newTeamName);
 
-    void refuseMember(String userId, String competitionId);
+    void refuseMember(String senderId, String competitionId);
 
+    List<TeamName> getReceivers(String competitionId, String senderId);
 }

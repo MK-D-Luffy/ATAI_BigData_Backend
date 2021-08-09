@@ -2,11 +2,39 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atai.competition.mapper.AtaiUserCompetitionMapper">
     <!--sql语句：根据比赛id，用户id查询信息-->
+    <sql id="Base_Column_List">
+        id,
+        user_id,
+        competition_id,
+        team_id,
+        score,
+        deadline,
+        team_name,
+        team_level,
+        submit_counts,
+        is_deleted,
+        gmt_create,
+        gmt_modified
+    </sql>
+    <resultMap id="BaseResultMap" type="com.atai.competition.entity.AtaiUserCompetition">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="competition_id" property="competitionId"/>
+        <result column="team_id" property="teamId"/>
+        <result column="score" property="score"/>
+        <result column="deadline" property="deadline"/>
+        <result column="team_name" property="teamName"/>
+        <result column="team_level" property="teamLevel"/>
+        <result column="submit_counts" property="submitCounts"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
     <select id="getMapperByUseridCompetitionId" resultType="com.atai.competition.entity.AtaiUserCompetition">
         SELECT *
         FROM atai_user_competition
         WHERE user_id = #{userId}
-        AND competition_id = #{competitionId}
+          AND competition_id = #{competitionId}
     </select>
 
     <!--sql语句：注册：根据比赛id，用户id插入团队id，团队名称-->
@@ -19,10 +47,10 @@
     <update id="updateMapperByUseridCompetitionId" parameterType="com.atai.competition.entity.AtaiUserCompetition">
         UPDATE atai_user_competition
         SET score=CONVERT(#{score}, DECIMAL(10, 2)),
-        deadline=#{date},
-        submitCounts=#{submitCounts}
+            deadline=#{date},
+            submitCounts=#{submitCounts}
         WHERE user_id = #{userId}
-        AND competition_id = #{competitionId}
+          AND competition_id = #{competitionId}
     </update>
 
     <!--sql语句：根据比赛id，用户id删除记录-->
@@ -30,7 +58,7 @@
         UPDATE atai_user_competition
         SET is_deleted=1
         WHERE user_id = #{userId}
-        AND competition_id = #{competitionId}
+          AND competition_id = #{competitionId}
     </update>
 
     <!--sql语句：最大值id-->
@@ -44,7 +72,7 @@
         SELECT *
         FROM atai_user_competition
         WHERE team_id = #{teamId}
-        AND competition_id = #{competitionId}
+          AND competition_id = #{competitionId}
     </select>
 
     <!--sql语句：根据比赛id，队伍id查询信息-->
@@ -58,27 +86,27 @@
     <select id="getMapperRanking" resultType="com.atai.competition.entity.vo.RankingQuery">
         SELECT um.nickname, auc.team_name, auc.score, auc.deadline
         FROM atai_user_competition auc,
-        ucenter_member um
+             ucenter_member um
         WHERE auc.competition_id = #{competitionId}
-        AND auc.user_id = um.id
+          AND auc.user_id = um.id
         ORDER BY score DESC;
     </select>
 
     <!--sql语句：根据用户id查询比赛列表信息-->
     <select id="getMyCompetitionList" resultType="com.atai.competition.entity.frontVo.MyCompetition">
         SELECT auc.competition_id AS id,
-        auc.team_id,
-        auc.score,
-        auc.team_name,
-        ac.`name`,
-        ac.`level`,
-        ac.`participants`,
-        ac.`deadline`,
-        ac.`money`
+               auc.team_id,
+               auc.score,
+               auc.team_name,
+               ac.`name`,
+               ac.`level`,
+               ac.`participants`,
+               ac.`deadline`,
+               ac.`money`
         FROM `atai_user_competition` auc,
-        atai_competition ac
+             atai_competition ac
         WHERE auc.`competition_id` = ac.`id`
-        AND auc.user_id = #{userId}
+          AND auc.user_id = #{userId}
     </select>
 
     <!--sql语句：根据key查询队伍信息-->
@@ -86,7 +114,7 @@
         SELECT team_name
         FROM atai_user_competition
         WHERE competition_id = #{competitionId}
-        AND team_name like CONCAT('%', #{key}, '%')
+          AND team_name like CONCAT('%', #{key}, '%')
     </select>
 
     <insert id="insertApplyMessage" parameterType="com.atai.competition.entity.AtaiApplyMsg">
@@ -97,17 +125,39 @@
     <select id="selectSenders" resultType="com.atai.competition.entity.AtaiApplyMsg">
         SELECT aam.`id`, aam.`sender_id`, aam.`receive_id`, um.`nickname` sender_name
         FROM `atai_apply_msg` aam,
-        atai.ucenter_member um
+             atai.ucenter_member um
         WHERE aam.`sender_id` = um.`id`
-        AND aam.`competition_id` = #{competitionId}
-        AND aam.`receive_id` = #{receiveId}
+          AND aam.`competition_id` = #{competitionId}
+          AND aam.`receive_id` = #{receiveId}
     </select>
 
     <delete id="deleteApplyMsg">
         delete
         from atai_apply_msg
         where sender_id = #{param1}
-        and competition_id = #{param2}
+          and competition_id = #{param2}
     </delete>
+
+    <select id="getMapperApplyCount" resultType="java.lang.Integer">
+        select count(1)
+        from atai_apply_msg
+        where competition_id = #{competitionId}
+          and sender_id = #{userId};
+    </select>
+
+    <select id="getMapperApplyTotalCount" resultType="java.lang.Integer">
+        select count(1)
+        from atai_apply_msg
+        where competition_id = #{competitionId}
+          and sender_id = #{userId}
+          and receive_id = #{receiveId};
+    </select>
+
+    <select id="selectReceivers" resultType="com.atai.competition.entity.AtaiApplyMsg">
+        select *
+        from atai_apply_msg
+        where competition_id = #{competitionId}
+          and sender_id = #{senderId};
+    </select>
 </mapper>
 

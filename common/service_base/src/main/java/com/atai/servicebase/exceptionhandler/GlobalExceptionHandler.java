@@ -1,8 +1,8 @@
 package com.atai.servicebase.exceptionhandler;
 
 
-import com.atai.commonutils.util.ExceptionUtil;
 import com.atai.commonutils.result.R;
+import com.atai.commonutils.util.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler (Exception.class)
     @ResponseBody
-    public R error(Exception e){
+    public R error(Exception e) {
         e.printStackTrace();
-        return R.error().message("有异常");
+        return R.error().message(e.getMessage());
     }
 
     //特定异常   先找特定异常  再找全局异常
-    @ExceptionHandler(ArithmeticException.class)
+    @ExceptionHandler (ArithmeticException.class)
     @ResponseBody //为了返回数据
     public R error(ArithmeticException e) {
         e.printStackTrace();
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     }
 
     //自定义异常
-    @ExceptionHandler(MSException.class)
+    @ExceptionHandler (MSException.class)
     @ResponseBody //为了返回数据
     public R error(MSException e) {
         log.error(e.getMessage());

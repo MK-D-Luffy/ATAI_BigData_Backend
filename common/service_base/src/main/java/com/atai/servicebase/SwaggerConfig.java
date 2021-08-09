@@ -34,7 +34,7 @@ public class SwaggerConfig {
                 .title("ATAI大数据竞赛平台-API文档")
                 .description("本文档描述了ATAI大数据竞赛平台接口定义")
                 .version("1.0")
-                .contact(new Contact("ATAI", "http://www.cqut.ltd", "1731976958@qq.com"))
+                .contact(new Contact("ATAI", "http://www.cqut.ltd", "1905470291@qq.com"))
                 .build();
     }
 }
