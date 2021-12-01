@@ -7,14 +7,15 @@ import com.atai.commonutils.result.ResultCodeEnum;
 import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
 import com.atai.eduucenter.entity.UcenterMember;
-import com.atai.eduucenter.entity.vo.ChangeVo;
+import com.atai.eduucenter.entity.vo.ChangeMobileOrEmailVo;
+import com.atai.eduucenter.entity.vo.ChangePwdVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
 import com.atai.eduucenter.service.UcenterMemberService;
 import com.atai.servicebase.exceptionhandler.MSException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,12 @@ import javax.servlet.http.HttpServletRequest;
  * @author ZengJinming
  * @since 2020-04-09
  */
-@Api (description = "登录和注册")
+@Api ("登录和注册")
 @RestController
 @RequestMapping ("/eduucenter/ucenter-member")
-@Slf4j
 //@CrossOrigin
 public class UcenterMemberController {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(UcenterMemberController.class);
     @Autowired
     UcenterMemberService ucenterMemberService;
 
@@ -75,11 +76,19 @@ public class UcenterMemberController {
         return R.success().data("flag", flag);
     }
 
+    //判断邮箱是否重复
+    @ApiOperation (value = "判断邮箱是否重复(返回true为重复)")
+    @GetMapping ("checkEmail/{email}")
+    public R checkEmail(@PathVariable String email) {
+        Boolean flag = ucenterMemberService.checkEmail(email);
+        return R.success().data("flag", flag);
+    }
+
     //更改密码
     @ApiOperation (value = "更改密码")
-    @PostMapping ("change")
-    public R changePassword(@RequestBody ChangeVo changeVo) {
-        ucenterMemberService.changePasswd(changeVo);
+    @PostMapping ("changePwd")
+    public R changePassword(@RequestBody ChangePwdVo changePwdVo) {
+        ucenterMemberService.changePwd(changePwdVo);
         return R.success().message("修改密码成功");
     }
 
@@ -99,28 +108,22 @@ public class UcenterMemberController {
     }
 
     //根据用户id获取用户信息
-    @ApiOperation (value = "根据用户id获取用户信息 课程评论用")
+    @ApiOperation (value = "根据用户id获取用户信息 个人中心用")
+    @PostMapping ("getUserInfo/{id}")
+    public R getUserInfo(@PathVariable String id) {
+        UcenterMember member = ucenterMemberService.getById(id);
+        return R.success().data("memberInfo", member);
+    }
+
+    //为其他微服务模块提供”根据用户id获取用户信息“的功能
+    @ApiOperation (value = "根据用户id获取用户信息 个人中心用")
     @PostMapping ("getUserInfoOrder/{id}")
-//    public R getUserInfoOrder(@PathVariable String id) {
     public UcenterMemberOrder getUserInfoOrder(@PathVariable String id) {
         UcenterMember member = ucenterMemberService.getById(id);
         //把member对象里面值复制给UcenterMemberOrder对象
         UcenterMemberOrder ucenterMemberOrder = new UcenterMemberOrder();
         BeanUtils.copyProperties(member, ucenterMemberOrder);
         return ucenterMemberOrder;
-//        return R.success().data("memberInfo",ucenterMemberOrder);
-    }
-
-    //根据用户id获取用户信息
-    @ApiOperation (value = "根据用户id获取用户信息 个人中心用")
-    @PostMapping ("getUserInfo/{id}")
-    public R getUserInfo(@PathVariable String id) {
-        UcenterMember member = ucenterMemberService.getById(id);
-        //把member对象里面值复制给UcenterMemberOrder对象
-        UcenterMemberOrder ucenterMemberOrder = new UcenterMemberOrder();
-        BeanUtils.copyProperties(member, ucenterMemberOrder);
-        //       return ucenterMemberOrder;
-        return R.success().data("memberInfo", ucenterMemberOrder);
     }
 
     //用户信息修改功能
@@ -143,11 +146,30 @@ public class UcenterMemberController {
         return R.success().data("countRegister", count);
     }
 
-    //根据邮箱或手机号获取验证码
-    @ApiOperation (value = "根据邮箱或手机号获取验证码")
-    @GetMapping ("getValidateCode/{emailOrMobile}")
-    public R getValidateCode(@PathVariable String emailOrMobile) {
-        String code = ucenterMemberService.getValidateCodeByEmailOrMobile(emailOrMobile);
-        return R.success().data("code", code);
+    //修改邮箱或手机号
+    @ApiOperation (value = "修改邮箱或手机号")
+    @PostMapping ("changeMobileOrEmail/{id}")
+    public R changeMobileOrEmail(@RequestBody ChangeMobileOrEmailVo changeMobileOrEmailVo,
+                                 @PathVariable String id) {
+        boolean flag = ucenterMemberService.changeMobileOrEmail(changeMobileOrEmailVo, id);
+        if (flag) {
+            return R.success();
+        } else {
+            return R.error();
+        }
     }
+
+    //安全性校验
+    @ApiOperation (value = "安全性校验")
+    @PostMapping ("validateSecurity/{id}")
+    public R validateSecurity(@RequestBody ChangeMobileOrEmailVo changeMobileOrEmailVo,
+                              @PathVariable String id) {
+        boolean flag = ucenterMemberService.validateSecurity(changeMobileOrEmailVo, id);
+        if (flag) {
+            return R.success();
+        } else {
+            return R.error();
+        }
+    }
+
 }

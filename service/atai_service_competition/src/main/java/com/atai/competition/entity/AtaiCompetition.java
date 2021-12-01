@@ -48,7 +48,6 @@ public class AtaiCompetition implements Serializable {
     private Long participants;
 
     @ApiModelProperty (value = "赛季截止时间")
-    @JsonFormat (pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date deadline;
 
     @ApiModelProperty (value = "可提交次数")

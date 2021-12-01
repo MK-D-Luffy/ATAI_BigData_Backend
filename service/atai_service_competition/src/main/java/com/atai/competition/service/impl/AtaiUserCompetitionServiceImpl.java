@@ -3,9 +3,7 @@ package com.atai.competition.service.impl;
 import com.alibaba.excel.EasyExcel;
 import com.atai.commonutils.result.R;
 import com.atai.competition.client.OssClient;
-import com.atai.competition.entity.AtaiApplyMsg;
-import com.atai.competition.entity.AtaiUserCompetition;
-import com.atai.competition.entity.TeamName;
+import com.atai.competition.entity.*;
 import com.atai.competition.entity.excel.CompeletionResult;
 import com.atai.competition.entity.frontVo.MyCompetition;
 import com.atai.competition.entity.vo.RankingQuery;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -44,6 +43,9 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
 
     @Autowired
     private AtaiUserCompetitionService ataiUserCompetitionService;
+
+    @Autowired
+    private AtaiRunCode ataiRunCode;
 
     //根据比赛id，用户id查询信息
     @Override
@@ -288,6 +290,12 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
             list.add(new TeamName().setTeamName(teamName));
         }
         return list;
+    }
+
+
+    @Override
+    public AtaiProcessResult runCode(String type, String code) throws IOException, InterruptedException {
+        return ataiRunCode.runCode(type, code);
     }
 
 }

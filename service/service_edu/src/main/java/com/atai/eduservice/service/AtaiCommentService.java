@@ -2,8 +2,6 @@ package com.atai.eduservice.service;
 
 import com.atai.eduservice.entity.AtaiComment;
 import com.atai.eduservice.entity.frontvo.CommentFrontVo;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

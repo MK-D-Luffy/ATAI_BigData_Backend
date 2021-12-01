@@ -3,7 +3,6 @@ package com.atai.eduservice.controller;
 
 import com.atai.commonutils.result.R;
 import com.atai.eduservice.entity.AtaiCategory;
-import com.atai.eduservice.entity.EduTeacher;
 import com.atai.eduservice.service.AtaiCategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
@@ -11,10 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Wrapper;
 import java.util.List;
 
 /**
@@ -25,7 +22,7 @@ import java.util.List;
  * @author linshengbin
  * @since 2021-04-14
  */
-@Api(description="文章分类相关")
+@Api ("文章分类相关")
 @RestController
 @RequestMapping("/eduservice/atai-category")
 public class AtaiCategoryController {

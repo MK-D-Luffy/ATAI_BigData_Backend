@@ -2,6 +2,7 @@ package com.atai.commonutils.ordervo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data

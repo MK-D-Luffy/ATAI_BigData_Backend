@@ -48,7 +48,7 @@
         UPDATE atai_user_competition
         SET score=CONVERT(#{score}, DECIMAL(10, 2)),
             deadline=#{date},
-            submitCounts=#{submitCounts}
+            submit_counts=#{submitCounts}
         WHERE user_id = #{userId}
           AND competition_id = #{competitionId}
     </update>

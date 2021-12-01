@@ -3,7 +3,6 @@ package com.atai.eduservice.controller;
 
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -14,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author linshengbin
  * @since 2021-04-14
  */
-@Api(description="文章体")
+@Api ("文章体")
 @RestController
-@RequestMapping("/eduservice/atai-article-body")
+@RequestMapping ("/eduservice/atai-article-body")
 public class AtaiArticleBodyController {
 
 }

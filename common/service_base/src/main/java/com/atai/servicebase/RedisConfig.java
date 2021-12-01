@@ -22,6 +22,48 @@ import java.time.Duration;
 @EnableCaching //开启缓存
 @Configuration  //配置类
 public class RedisConfig extends CachingConfigurerSupport {
+//
+//    /**
+//     * 最新版，设置redis缓存过期时间
+//     *
+//     * @param redisConnectionFactory
+//     * @return
+//     */
+//    @Bean
+//    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+//        return new RedisCacheManager(
+//                RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
+//                // 默认策略，未配置的 key 会使用这个
+//                this.getRedisCacheConfigurationWithTtl(600),
+//                // 指定 key 策略
+//                this.getRedisCacheConfigurationMap());
+//    }
+//
+//    private Map<String, RedisCacheConfiguration> getRedisCacheConfigurationMap() {
+//        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
+//
+//        //自定义设置缓存时间
+////        redisCacheConfigurationMap.put("userCache", this.getRedisCacheConfigurationWithTtl(60));
+//
+//        return redisCacheConfigurationMap;
+//    }
+//
+//    private RedisCacheConfiguration getRedisCacheConfigurationWithTtl(Integer seconds) {
+//        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+//        ObjectMapper om = new ObjectMapper();
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        jackson2JsonRedisSerializer.setObjectMapper(om);
+//        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+//        redisCacheConfiguration = redisCacheConfiguration.serializeValuesWith(
+//                RedisSerializationContext
+//                        .SerializationPair
+//                        .fromSerializer(jackson2JsonRedisSerializer)
+//        ).entryTtl(Duration.ofSeconds(seconds));
+//
+//        return redisCacheConfiguration;
+//    }
+
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
@@ -41,6 +83,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
         return template;
     }
+
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {

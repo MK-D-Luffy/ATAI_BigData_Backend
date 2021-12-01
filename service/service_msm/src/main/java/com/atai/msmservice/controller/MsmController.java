@@ -1,6 +1,7 @@
 package com.atai.msmservice.controller;
 
 import com.atai.commonutils.result.R;
+import com.atai.commonutils.result.ResultCodeEnum;
 import com.atai.commonutils.util.SendMail;
 import com.atai.msmservice.service.MsmService;
 import com.atai.msmservice.utils.RandomUtil;
@@ -14,43 +15,50 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Api(description="短信服务")
+@Api ("短信服务")
 @RestController
-@RequestMapping("/edumsm/msm")
+@RequestMapping ("/edumsm/msm")
 //@CrossOrigin
 public class MsmController {
     @Autowired
     private MsmService msmService;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     //发送邮件的方法
-    @ApiOperation(value = "发送邮件")
-    @GetMapping("sendByEmail/{email}")
+    @ApiOperation (value = "发送邮件")
+    @GetMapping ("sendByEmail/{email}")
     public R sendEmail(@PathVariable String email) {
-        //1 从redis获取验证码，如果获取到直接返回
-        String code = redisTemplate.opsForValue().get(email);
-        if (!StringUtils.isEmpty(code)) {
-            return R.success();
+        //1 从redis获取验证码发送次数，防止频繁发送验证码
+        //邮箱设置5分钟发3次
+        String countStr = redisTemplate.opsForValue().get(email + "Count");
+        int count = 0;
+
+        if (!StringUtils.isEmpty(countStr)) {
+            count = Integer.parseInt(countStr);
+            if (count >= 3) {
+                return R.error()
+                        .code(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL.getCode())
+                        .message(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL.getMessage());
+            }
         }
+        count++;
 
         //2 如果redis获取 不到，进行邮件发送
         //生成随机值
-        code = RandomUtil.getFourBitRandom();
-        Map<String, Object> param = new HashMap<>();
-        param.put("code", code);
+        String code = RandomUtil.getSixBitRandom();
         String senderName = "ATAIEmail";
         String subject = "ATAI大数据竞赛平台";
         String content = "本次验证码为:" + code + ",验证码有效时间为5分钟。";
-        //调用s发送邮件的方法
+        //调用发送邮件的方法
         try {
             SendMail.senEmail(email, senderName, email, subject, content);
             redisTemplate.opsForValue().set(email, code, 5, TimeUnit.MINUTES);
+            //设置一分钟发送次数(防止频繁发送)
+            redisTemplate.opsForValue().set(email + "Count", count + "", 1, TimeUnit.MINUTES);
             return R.success();
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,30 +68,64 @@ public class MsmController {
 
 
     //发送短信的方法
-    @ApiOperation(value = "发送短信")
-    @GetMapping("send/{phoneNumber}")
-    public R sendMsm(@PathVariable String phoneNumber){
-        //1 从redis获取验证码，如果获取到直接返回
-        String code = redisTemplate.opsForValue().get(phoneNumber);
-        if(!StringUtils.isEmpty(code)) {
-            return R.success();
-        }
+    @ApiOperation (value = "发送短信")
+    @GetMapping ("send/{phoneNumber}")
+    public R sendMsm(@PathVariable String phoneNumber) {
+        //1 从redis获取验证码发送次数，防止频繁发送验证码
+        //(1) 一分钟不能超过1条
+        //(2) 一小时不能超过5条
+        //(3) 一天不能超过10条
+//        String countStrM = redisTemplate.opsForValue().get(phoneNumber + "CountM");
+//        String countStrH = redisTemplate.opsForValue().get(phoneNumber + "CountH");
+//        String countStrD = redisTemplate.opsForValue().get(phoneNumber + "CountD");
+//
+//        int countM = 0;
+//        int countH = 0;
+//        int countD = 0;
+//        if (!StringUtils.isEmpty(countStrD)) {
+//            countD = Integer.parseInt(countStrD);
+//            if (countD >= 10) {
+//                return R.error()
+//                        .code(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_DAY_CONTROL.getCode())
+//                        .message(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_DAY_CONTROL.getMessage());
+//            } else if (!StringUtils.isEmpty(countStrH)) {
+//                countH = Integer.parseInt(countStrH);
+//                if (countH >= 5) {
+//                    return R.error()
+//                            .code(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_HOUR_CONTROL.getCode())
+//                            .message(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_HOUR_CONTROL.getMessage());
+//                } else if (!StringUtils.isEmpty(countStrM)) {
+//                    countM = Integer.parseInt(countStrM);
+//                    if (countM >= 1) {
+//                        return R.error()
+//                                .code(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL.getCode())
+//                                .message(ResultCodeEnum.SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL.getMessage());
+//                    }
+//                }
+//            }
+//        }
+//        countM++;
+//        countH++;
+//        countD++;
 
         //2 如果redis获取 不到，进行阿里云发送
         //生成随机值，传递阿里云进行发送
-        code = RandomUtil.getFourBitRandom();
-        Map<String,Object> param = new HashMap<>();
-        param.put("checkcode",code);
+        String code = RandomUtil.getSixBitRandom();
+        String[] param = {code, "5"};
 
         //调用service发送短信的方法
-        boolean isSend = msmService.send(param,phoneNumber);
-        if(isSend) {
+        boolean isSend = msmService.send(param, phoneNumber);
+        if (isSend) {
             //发送成功，把发送成功验证码放到redis里面
             //设置有效时间
-            redisTemplate.opsForValue().set(phoneNumber,code,5, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(phoneNumber, code, 5, TimeUnit.MINUTES);
+            //设置发送次数(防止频繁发送)
+//            redisTemplate.opsForValue().set(phoneNumber + "CountM", countM + "", 1, TimeUnit.MINUTES);
+//            redisTemplate.opsForValue().set(phoneNumber + "CountH", countH + "", 1, TimeUnit.HOURS);
+//            redisTemplate.opsForValue().set(phoneNumber + "CountD", countD + "", 1, TimeUnit.DAYS);
             return R.success();
         } else {
-            return R.error().message("短信发送失败");
+            return R.error().message("发送失败:短信发送过于频繁或内部出现错误");
         }
     }
 }

@@ -1,18 +1,17 @@
 package com.atai.eduservice.controller.front;
 
+import com.atai.commonutils.result.R;
 import com.atai.eduservice.entity.EduTeacher;
 import com.atai.eduservice.service.EduTeacherService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.atai.commonutils.result.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
-@Api(description="实验室成员页功能")
+@Api ("实验室成员页功能")
 @RestController
 @RequestMapping("/eduservice/teacherfront")
 //@CrossOrigin

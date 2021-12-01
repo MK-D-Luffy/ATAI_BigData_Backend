@@ -20,7 +20,7 @@ import java.util.List;
 public class AtaiNoticeServiceImpl extends ServiceImpl<AtaiNoticeMapper, AtaiNotice> implements AtaiNoticeService {
 
     @Override
-    public List<AtaiNotice> getLatestNotice() {
-        return baseMapper.getLatestNotice();
+    public List<AtaiNotice> getLatestNotice(String type) {
+        return baseMapper.getLatestNotice(type);
     }
 }

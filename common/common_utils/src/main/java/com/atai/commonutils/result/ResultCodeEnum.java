@@ -49,14 +49,16 @@ public enum ResultCodeEnum {
     CODE_ERROR(false, 28000, "验证码错误"),
 
     LOGIN_PHONE_ERROR(false, 28009, "手机号码不正确"),
-    LOGIN_MOBILE_ERROR(false, 28001, "账号不正确"),
+    LOGIN_MOBILE_EMAIL_ERROR(false, 28001, "账号不正确"),
     LOGIN_PASSWORD_ERROR(false, 28008, "密码不正确"),
     LOGIN_DISABLED_ERROR(false, 28002, "该用户已被禁用"),
     REGISTER_MOBLE_ERROR(false, 28003, "手机号已被注册"),
     LOGIN_AUTH(false, 28004, "需要登录"),
     LOGIN_ACL(false, 28005, "没有权限"),
-    SMS_SEND_ERROR(false, 28006, "短信发送失败"),
-    SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL(false, 28007, "短信发送过于频繁"),
+    SMS_SEND_ERROR(false, 29001, "短信发送失败"),
+    SMS_SEND_ERROR_BUSINESS_LIMIT_CONTROL(false, 29002, "验证码发送过于频繁"),
+    SMS_SEND_ERROR_BUSINESS_LIMIT_HOUR_CONTROL(false, 29003, "短信发送次数已超出一小时限制,请一小时后重试"),
+    SMS_SEND_ERROR_BUSINESS_LIMIT_DAY_CONTROL(false, 29004, "短信今日发送次数已超出限制,请一天后重试"),
     MY_VALUE(false, 30000, "我的错误");
 
 

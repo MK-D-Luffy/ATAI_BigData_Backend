@@ -20,7 +20,7 @@ import java.util.List;
  * @author linshengbin
  * @since 2021-02-18
  */
-@Api(description="比赛分类管理")
+@Api ("比赛分类管理")
 @RestController
 @RequestMapping("/atitcompetition/atai-comp-level")
 public class AtaiCompLevelController {

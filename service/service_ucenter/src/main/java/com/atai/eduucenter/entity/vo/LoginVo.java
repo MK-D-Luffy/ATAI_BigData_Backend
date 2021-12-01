@@ -13,8 +13,8 @@ import java.io.Serializable;
 public class LoginVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "手机号")
-    private String mobile;
+    @ApiModelProperty (value = "手机号")
+    private String mobileOrEmail;
 
     @ApiModelProperty(value = "密码")
     private String password;

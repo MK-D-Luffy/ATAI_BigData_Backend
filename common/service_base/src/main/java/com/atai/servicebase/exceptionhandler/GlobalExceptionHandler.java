@@ -3,14 +3,15 @@ package com.atai.servicebase.exceptionhandler;
 
 import com.atai.commonutils.result.R;
 import com.atai.commonutils.util.ExceptionUtil;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler (Exception.class)
     @ResponseBody
     public R error(Exception e) {
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
     @ResponseBody //为了返回数据
     public R error(ArithmeticException e) {
         e.printStackTrace();
-        return R.error().message("执行了ArithmeticException异常处理..");
+        return R.error().message("执行了算术异常处理..");
     }
 
     //自定义异常
@@ -34,6 +35,6 @@ public class GlobalExceptionHandler {
         log.error(ExceptionUtil.getMessage(e));
         e.printStackTrace();
 
-        return R.error().code(e.getCode()).message(e.getMsg());
+        return R.error().code(e.getCode()).message(e.getMessage());
     }
 }

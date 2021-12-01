@@ -1,59 +1,61 @@
 package com.atai.msmservice.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import com.aliyuncs.CommonRequest;
-import com.aliyuncs.CommonResponse;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
-import com.aliyuncs.http.MethodType;
-import com.aliyuncs.profile.DefaultProfile;
 import com.atai.msmservice.service.MsmService;
-import com.atai.msmservice.utils.ConstantPropertiesUtil;
+import com.atai.msmservice.utils.SendSmsProperties;
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.sms.v20190711.SmsClient;
+import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
+import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
+import com.tencentcloudapi.sms.v20190711.models.SendStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.Map;
 
 @Service
 public class MsmServiceImpl implements MsmService {
 
+    @Autowired
+    private SendSmsProperties sendSmsProperties;
+
     //发送短信的方法
     @Override
-    public boolean send(Map<String, Object> param, String phoneNumber) {
+    public boolean send(String[] param, String phoneNumber) {
         // 工具类获取值
-        String accessKeyId = ConstantPropertiesUtil.ACCESS_KEY_ID;
-        String accessKeySecret = ConstantPropertiesUtil.ACCESS_KEY_SECRET;
-        String signName =  ConstantPropertiesUtil.SIGN_NAME;
-        String templateCode = ConstantPropertiesUtil.CODE;
+        String secretId = sendSmsProperties.getSecretId();
+        String secretKey = sendSmsProperties.getSecretKey();
+        String appId = sendSmsProperties.getAppId();
+        String sign = sendSmsProperties.getSign();
+        String templateId = sendSmsProperties.getTemplateId();
 
-        if(StringUtils.isEmpty(phoneNumber)) return false;
-
-        DefaultProfile profile =
-                DefaultProfile.getProfile("default", accessKeyId, accessKeySecret);
-        IAcsClient client = new DefaultAcsClient(profile);
-
-        //设置相关参数  固定的
-        CommonRequest request = new CommonRequest();
-        //request.setProtocol(ProtocolType.HTTPS);
-        request.setMethod(MethodType.POST);
-        request.setDomain("dysmsapi.aliyuncs.com");
-        request.setVersion("2017-05-25");
-        request.setAction("SendSms");
-
-        //设置发送相关的参数
-        request.putQueryParameter("PhoneNumbers",phoneNumber); //手机号
-        request.putQueryParameter("SignName",signName); //申请阿里云 签名名称
-        request.putQueryParameter("TemplateCode",templateCode); //申请阿里云 模板code
-        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(param)); //验证码数据，转换json数据传递
+        if (StringUtils.isEmpty(phoneNumber)) {
+            return false;
+        }
 
         try {
-            //最终发送
-            CommonResponse response = client.getCommonResponse(request);
-            boolean success = response.getHttpResponse().isSuccess();
-            return success;
-        }catch(Exception e) {
+            // 实例化一个认证对象
+            Credential cred = new Credential(secretId, secretKey);
+            // 实例化一个客户端配置对象
+            ClientProfile clientProfile = new ClientProfile();
+            // 实例化 SMS 的 client 对象
+            SmsClient client = new SmsClient(cred, "", clientProfile);
+            // 实例化一个请求对象
+            SendSmsRequest req = new SendSmsRequest();
+            req.setSmsSdkAppid(appId);
+            req.setSign(sign);
+            req.setTemplateID(templateId);
+            req.setPhoneNumberSet(new String[]{"+86" + phoneNumber});
+            req.setTemplateParamSet(param);
+            // 发送请求
+            SendSmsResponse res = client.SendSms(req);
+
+            SendStatus[] status = res.getSendStatusSet();
+            return "Ok".equals(status[0].getCode());
+        } catch (TencentCloudSDKException e) {
             e.printStackTrace();
             return false;
         }
+
     }
 }

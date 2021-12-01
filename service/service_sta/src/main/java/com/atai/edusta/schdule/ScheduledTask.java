@@ -5,11 +5,8 @@ import com.atai.edusta.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import com.atai.commonutils.util.SendMail;
+
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import com.atai.commonutils.result.R;
 
 @Component
 public class ScheduledTask {
@@ -34,7 +31,7 @@ public class ScheduledTask {
 //        String subject = "报表统计";
 //        //从数据库获取报表内容，定时发送给订阅者
 //        String email = "1241765589@qq.com";
-//        //调用s发送邮件的方法
+//        //调用发送邮件的方法
 //        try {
 //            //发送邮件
 //            SendMail.senEmail(email,senderName,email,subject,content);

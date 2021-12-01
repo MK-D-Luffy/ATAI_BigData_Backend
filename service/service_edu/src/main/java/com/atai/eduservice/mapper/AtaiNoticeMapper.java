@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface AtaiNoticeMapper extends BaseMapper<AtaiNotice> {
 
-    List<AtaiNotice> getLatestNotice();
+    List<AtaiNotice> getLatestNotice(String type);
 }

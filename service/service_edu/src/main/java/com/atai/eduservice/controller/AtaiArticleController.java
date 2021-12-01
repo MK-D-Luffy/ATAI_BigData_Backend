@@ -35,7 +35,7 @@ import java.util.List;
  * @author linshengbin
  * @since 2021-04-14
  */
-@Api(description="文章相关")
+@Api ("文章相关")
 @RestController
 @RequestMapping("/eduservice/atai-article")
 public class AtaiArticleController {

@@ -6,7 +6,6 @@ import com.atai.edusta.entity.StatisticsDaily;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 网站统计日数据 Mapper 接口

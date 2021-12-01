@@ -6,10 +6,7 @@ import com.atai.commonutils.result.R;
 import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
 import com.atai.competition.client.UcenterClient;
-import com.atai.competition.entity.AtaiApplyMsg;
-import com.atai.competition.entity.AtaiCompetition;
-import com.atai.competition.entity.AtaiUserCompetition;
-import com.atai.competition.entity.TeamName;
+import com.atai.competition.entity.*;
 import com.atai.competition.entity.frontVo.MyCompetition;
 import com.atai.competition.entity.vo.RankingQuery;
 import com.atai.competition.entity.vo.TeamCompetition;
@@ -19,7 +16,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,9 +41,9 @@ import java.util.UUID;
 @Api (description = "用户比赛管理")
 @RestController
 @RequestMapping ("/atitcompetition/atai-user-competition")
-@Slf4j
 public class AtaiUserCompetitionController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AtaiUserCompetitionController.class);
     @Autowired
     private AtaiCompetitionService ataiCompetitionService;
 
@@ -64,7 +62,7 @@ public class AtaiUserCompetitionController {
     @GetMapping ("getUserCompetition/{competitionId}")
     public R getUserCompetition(@PathVariable String competitionId,
                                 HttpServletRequest request) {
-        JwtInfo jwtToken = null;
+        JwtInfo jwtToken;
         try {
             jwtToken = JwtUtils.getMemberIdByJwtToken(request);
         } catch (ExpiredJwtException e) {
@@ -190,7 +188,7 @@ public class AtaiUserCompetitionController {
         return R.success().data("ranking", ranking1);
     }
 
-    // 根据姓名获取排名
+    //7.根据姓名获取排名
     @ApiOperation (value = "根据比赛id，团队名，查询该团队的排名")
     @GetMapping ("getRank/{competitionId}/{nickName}")
     public R getRank(@PathVariable String competitionId, @PathVariable String nickName) {
@@ -206,10 +204,11 @@ public class AtaiUserCompetitionController {
     }
 
 
-    //查询当前用户的比赛列表
+    //8.查询当前用户的比赛列表
     @ApiOperation (value = "查询当前用户的比赛列表")
-    @GetMapping ("getMyCompetitionList")
-    public R getMyCompetitionList(HttpServletRequest request) {
+    @GetMapping ("getMyCompetitionList/{current}/{limit}")
+    public R getMyCompetitionList(@PathVariable String current, @PathVariable String limit,
+                                  HttpServletRequest request) {
         JwtInfo jwtToken = null;
         try {
             jwtToken = JwtUtils.getMemberIdByJwtToken(request);
@@ -220,11 +219,12 @@ public class AtaiUserCompetitionController {
             return R.error().code(28004).message("登录已过期，请重新登录");
         }
         String userId = jwtToken.getId();
+
         List<MyCompetition> data = ataiUserCompetitionService.getMyCompetitionList(userId);
         return R.success().data("data", data);
     }
 
-    //通过key查询团队
+    //9.通过key查询团队
     @ApiOperation (value = "根据比赛id，获取包含key的团队名")
     @GetMapping ("searchTeams/{competitionId}/{key}")
     public R searchTeams(@PathVariable String competitionId, @PathVariable (required = false) String key) {
@@ -232,7 +232,7 @@ public class AtaiUserCompetitionController {
         return R.success().data("teams", teams);
     }
 
-    //修改团队名称
+    //10.修改团队名称
     @ApiOperation (value = "根据比赛id，teamId，修改团队名称")
     @GetMapping ("changeTeamName/{competitionId}/{oldTeamId}/{newTeamName}")
     public R changeTeamName(@PathVariable String competitionId,
@@ -249,7 +249,7 @@ public class AtaiUserCompetitionController {
         }
     }
 
-    //生成随机团队名称
+    //11.生成随机团队名称
     @ApiOperation (value = "通过比赛id，用户id，生成随机团队名称")
     @GetMapping ("createTeamName/{competitionId}/{userId}")
     public R createTeamName(@PathVariable String competitionId,
@@ -258,7 +258,7 @@ public class AtaiUserCompetitionController {
         return R.success();
     }
 
-    //申请加入团队
+    //12.申请加入团队
     @ApiOperation (value = "通过比赛id和我的用户id，申请加入团队名为teamName的团队")
     @GetMapping ("applyToJoinTeam/{competitionId}/{teamName}/{userId}")
     public R applyToJoinTeam(@PathVariable String competitionId,
@@ -272,7 +272,7 @@ public class AtaiUserCompetitionController {
         }
     }
 
-    //获取我收到的申请
+    //13.获取我收到的申请
     @ApiOperation (value = "通过比赛id，用户id，获取我收到的申请")
     @GetMapping ("getSenders/{competitionId}/{receiveId}")
     public R getSenders(@PathVariable String competitionId,
@@ -281,7 +281,7 @@ public class AtaiUserCompetitionController {
         return R.success().data("senders", list);
     }
 
-    //接受成员加入团队
+    //14.接受成员加入团队
     @ApiOperation (value = "根据比赛id，用户id,接受加入团队")
     @GetMapping ("acceptMember/{competitionId}/{senderId}/{userId}/{newTeamName}")
     public R acceptMember(@PathVariable String competitionId,
@@ -297,7 +297,7 @@ public class AtaiUserCompetitionController {
     }
 
 
-    //拒绝成员加入团队
+    //15.拒绝成员加入团队
     @ApiOperation (value = "根据比赛id，用户id,拒绝加入团队")
     @GetMapping ("refuseMember/{competitionId}/{senderId}")
     public R refuseMember(@PathVariable String competitionId,
@@ -306,7 +306,7 @@ public class AtaiUserCompetitionController {
         return R.success();
     }
 
-    //退出团队
+    //16.退出团队
     @ApiOperation (value = "根据比赛id，用户id,拒绝加入团队")
     @GetMapping ("quitTeam/{competitionId}/{userId}")
     public R quitTeam(@PathVariable String competitionId,
@@ -315,13 +315,27 @@ public class AtaiUserCompetitionController {
         return R.success();
     }
 
-    //获取我的申请
+    //17.获取我的申请
     @ApiOperation (value = "根据比赛id，申请人id,获取申请信息")
     @GetMapping ("getReceivers/{competitionId}/{senderId}")
     public R getReceivers(@PathVariable String competitionId,
                           @PathVariable String senderId) {
         List<TeamName> list = ataiUserCompetitionService.getReceivers(competitionId, senderId);
         return R.success().data("receivers", list);
+    }
+
+    //17.运行代码
+    @ApiOperation (value = "运行代码")
+    @PostMapping ("runCode")
+    public R runCode(@RequestBody AtaiCodeModel ataiCodeModel) {
+        AtaiProcessResult result = null;
+        try {
+            result = ataiUserCompetitionService.runCode(ataiCodeModel.getType(), ataiCodeModel.getCode());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return R.error().message("代码运行异常");
+        }
+        return R.success().data("result", result.getOutput());
     }
 }
 

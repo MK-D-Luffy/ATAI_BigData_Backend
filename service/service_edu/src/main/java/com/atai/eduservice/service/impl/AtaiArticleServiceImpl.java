@@ -6,7 +6,6 @@ import com.atai.eduservice.entity.frontvo.ArticleFrontVo;
 import com.atai.eduservice.entity.vo.ArticleQuery;
 import com.atai.eduservice.mapper.AtaiArticleMapper;
 import com.atai.eduservice.service.AtaiArticleService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface AtaiNoticeService extends IService<AtaiNotice> {
 
-    List<AtaiNotice> getLatestNotice();
+    List<AtaiNotice> getLatestNotice(String type);
 }

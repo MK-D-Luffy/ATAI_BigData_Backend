@@ -13,7 +13,7 @@ import com.atai.eduservice.service.AtaiCommentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +29,12 @@ import java.util.List;
  * @author linshengbin
  * @since 2021-04-14
  */
-@Api(description="评论相关")
+@Api ("评论相关")
 @RestController
 @RequestMapping("/eduservice/atai-comment")
-@Slf4j
 public class AtaiCommentController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AtaiCommentController.class);
     @Autowired
     private AtaiCommentService ataiCommentService;
 

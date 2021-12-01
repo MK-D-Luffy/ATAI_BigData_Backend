@@ -3,7 +3,8 @@ package com.atai.eduucenter.service.impl;
 import com.atai.commonutils.result.ResultCodeEnum;
 import com.atai.commonutils.util.*;
 import com.atai.eduucenter.entity.UcenterMember;
-import com.atai.eduucenter.entity.vo.ChangeVo;
+import com.atai.eduucenter.entity.vo.ChangeMobileOrEmailVo;
+import com.atai.eduucenter.entity.vo.ChangePwdVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
 import com.atai.eduucenter.mapper.UcenterMemberMapper;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 会员表 服务实现类
@@ -28,36 +31,108 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    /**
+     * @param mobileOrEmail 手机号或邮箱
+     * @param validateStr   用于统计校验次数的字符串
+     * @param code          验证码
+     */
+    public void validateCode(String mobileOrEmail, String validateStr, String code) {
+        //增加验证码使用次数的校验
+        int validateCount = 1;
+        String countStr = redisTemplate.opsForValue().get(validateStr + "ValidateCount");
+        if (countStr != null) {
+            validateCount = Integer.parseInt(countStr);
+            if (validateCount >= 5) {
+                redisTemplate.delete(mobileOrEmail);
+                redisTemplate.delete(validateStr + "ValidateCount");
+                throw new MSException(20001, "验证码错误次数已经超过最大次数，已重置，请重新获取验证码！");
+            }
+        }
+
+        //获取redis验证码
+        String redisCode = redisTemplate.opsForValue().get(mobileOrEmail);
+        //判断验证码
+        if (!code.equals(redisCode)) {
+            validateCount++;
+            redisTemplate.opsForValue().set(validateStr + "ValidateCount", validateCount + "", 5, TimeUnit.MINUTES);
+            throw new MSException(20001, "验证🐎有误！注册失败！");
+        } else {
+            //校验成功后,删除验证码
+            redisTemplate.delete(mobileOrEmail);
+        }
+    }
+
     //登录的方法
     @Override
     public String login(LoginVo loginVo) {
-
-        String mobile = loginVo.getMobile();
+        String mobileOrEmail = loginVo.getMobileOrEmail();
         String password = loginVo.getPassword();
 
         try {
             password = AESUtil.desEncrypt(password).trim();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new MSException(20001, "密码出现错误");
         }
 
         //校验：参数是否合法
-        if (StringUtils.isEmpty(mobile)
-                || !FormUtils.isMobile(mobile)
-                || StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(mobileOrEmail) || StringUtils.isEmpty(password)) {
             throw new MSException(ResultCodeEnum.PARAM_ERROR);
         }
 
-        //校验手机号是否存在
+        //校验手机号或邮箱是否存在
         QueryWrapper<UcenterMember> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("mobile", mobile);
+        if (FormUtils.isMobile(mobileOrEmail)) {
+            queryWrapper.eq("mobile", mobileOrEmail);
+        } else if (FormUtils.isEmail(mobileOrEmail)) {
+            queryWrapper.eq("email", mobileOrEmail);
+        } else {
+            throw new MSException(ResultCodeEnum.PARAM_ERROR);
+        }
+
+        //获取用户信息
         UcenterMember member = baseMapper.selectOne(queryWrapper);
         if (member == null) {
-            throw new MSException(ResultCodeEnum.LOGIN_MOBILE_ERROR);
+            throw new MSException(ResultCodeEnum.LOGIN_MOBILE_EMAIL_ERROR);
+        }
+
+
+        int loginFailedCount = 0;
+        String timeCounter = redisTemplate.opsForValue().get(mobileOrEmail + "timeCounter");
+        if (timeCounter != null) {
+            throw new MSException(20001, "账号冻结中,无法登录");
+        }
+
+        String countStr = redisTemplate.opsForValue().get(mobileOrEmail + "LoginFailedCount");
+        if (countStr != null) {
+            loginFailedCount = Integer.parseInt(countStr);
+            if (loginFailedCount == 5) {
+                loginFailedCount++;
+                redisTemplate.opsForValue().set(mobileOrEmail + "LoginFailedCount", loginFailedCount + "");
+                redisTemplate.opsForValue().set(mobileOrEmail + "timeCounter", "value", 2, TimeUnit.MINUTES);
+                throw new MSException(20001, "您的账号已被冻结,请于两分钟后重试");
+            } else if (loginFailedCount == 8) {
+                loginFailedCount++;
+                redisTemplate.opsForValue().set(mobileOrEmail + "LoginFailedCount", loginFailedCount + "");
+                redisTemplate.opsForValue().set(mobileOrEmail + "timeCounter", "value", 10, TimeUnit.MINUTES);
+                throw new MSException(20001, "您的账号已被冻结,请于十分钟后重试");
+            } else if (loginFailedCount == 12) {
+                loginFailedCount++;
+                redisTemplate.opsForValue().set(mobileOrEmail + "LoginFailedCount", loginFailedCount + "");
+                redisTemplate.opsForValue().set(mobileOrEmail + "timeCounter", "value", 1, TimeUnit.HOURS);
+                throw new MSException(20001, "您的账号已被冻结,请于一小时后重试");
+            } else if (loginFailedCount == 16) {
+//                loginFailedCount++;
+//                redisTemplate.opsForValue().set(mobileOrEmail + "LoginFailedCount", loginFailedCount + "");
+                redisTemplate.delete(mobileOrEmail + "LoginFailedCount");
+                redisTemplate.opsForValue().set(mobileOrEmail + "timeCounter", "value", 1, TimeUnit.DAYS);
+                throw new MSException(20001, "您的账号已被冻结,请于一天后重试");
+            }
         }
 
         //校验密码是否正确
         if (!MD5.encrypt(password).equals(member.getPassword())) {
+            loginFailedCount++;
+            redisTemplate.opsForValue().set(mobileOrEmail + "LoginFailedCount", loginFailedCount + "");
             throw new MSException(ResultCodeEnum.LOGIN_PASSWORD_ERROR);
         }
 
@@ -66,11 +141,13 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             throw new MSException(ResultCodeEnum.LOGIN_DISABLED_ERROR);
         }
 
-        //登录：生成token
+        //登录:生成token
         JwtInfo info = new JwtInfo();
         info.setId(member.getId());
         info.setNickname(member.getNickname());
         info.setAvatar(member.getAvatar());
+        //删除登录失败信息
+        redisTemplate.delete(mobileOrEmail + "LoginFailedCount");
 
         String jwtToken = JwtUtils.getJwtToken(info, 604800);
 
@@ -81,39 +158,28 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     @Override
     public void register(RegisterVo registerVo) {
         //获取注册的数据 校验参数
-        String code = registerVo.getCode(); //验证码
+        String nickname = registerVo.getNickname(); //昵称
         String mobile = registerVo.getMobile(); //手机号
         String email = registerVo.getEmail(); //邮箱
-        String nickname = registerVo.getNickname(); //昵称
+        String code = registerVo.getCode(); //验证码
         String password = registerVo.getPassword(); //密码
+        String codeType = registerVo.getCodeType();
 
         //非空判断
         if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password) || StringUtils.isEmpty(email)
                 || StringUtils.isEmpty(code) || StringUtils.isEmpty(nickname)) {
             throw new MSException(20001, "注册失败！");
         }
-        //设置验证码
-        //发生邮件
-        //判断验证码
-        //获取redis验证码
-        String redisCode = redisTemplate.opsForValue().get(email);
-        if (!code.equals(redisCode)) {
-            throw new MSException(20001, "验证🐎有误！注册失败！");
+
+        String mobileOrEmail;
+        if ("1".equals(codeType)) {
+            mobileOrEmail = mobile;
+        } else {
+            mobileOrEmail = email;
         }
 
-        //判断手机号是否重复，表里面存在相同手机号不进行添加
-        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
-        wrapper.eq("mobile", mobile);
-        Integer count = baseMapper.selectCount(wrapper);
-
-        if (count > 0) {
-            throw new MSException(20001, "该手机号已注册！注册失败！");
-        }
-        wrapper.eq("email", email);
-        count = baseMapper.selectCount(wrapper);
-        if (count > 0) {
-            throw new MSException(20001, "该邮箱已注册！注册失败！");
-        }
+        //校验验证码
+        validateCode(mobileOrEmail, mobileOrEmail + "Register", code);
 
         //数据添加数据库中
         UcenterMember member = new UcenterMember();
@@ -122,7 +188,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         member.setNickname(nickname);
         member.setPassword(MD5.encrypt(password));//密码需要进行MD5加密
         member.setIsDisabled(false);//用户不禁用
-        member.setAvatar("https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png");
+        member.setAvatar("https://atai-bigdata.oss-cn-chengdu.aliyuncs.com/2021/08/24/e1a697a90c4d43ed9f1ba6b7dc31d5281.png");
         baseMapper.insert(member);
     }
 
@@ -131,8 +197,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     public UcenterMember getOpenIdMember(String openid) {
         QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
         wrapper.eq("openid", openid);
-        UcenterMember member = baseMapper.selectOne(wrapper);
-        return member;
+        return baseMapper.selectOne(wrapper);
     }
 
     //查询某天注册人数
@@ -157,53 +222,111 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         return baseMapper.selectCount(wrapper) > 0;
     }
 
-    //更改密码
+    //判断邮箱是否重复(返回true为重复)
     @Override
-    public void changePasswd(ChangeVo changeVo) {
-        //获取注册的数据 校验参数
-        String code = changeVo.getCode(); //验证码
-        String email = changeVo.getEmail(); //手机号
-        String password = changeVo.getPassword(); //密码
-
-        //非空判断
-        if (StringUtils.isEmpty(email) || StringUtils.isEmpty(password)
-                || StringUtils.isEmpty(code)) {
-            throw new MSException(20001, "修改密码失败！");
-        }
-
-        //判断验证码
-        //获取redis验证码
-//        String redisCode = redisTemplate.opsForValue().get(mobile);
-//        if(!code.equals(redisCode)){
-//            throw new MSException(20001,"验证🐎有误！修改密码失败！");
-//        }
-
-//        UcenterMember ucenterMember = new UcenterMember();
-//        BeanUtils.copyProperties(changeVo,ucenterMember);
-//        System.out.println("ucenterMember = " + ucenterMember);
-
+    public Boolean checkEmail(String email) {
         QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
         wrapper.eq("email", email);
-        UcenterMember member = baseMapper.selectOne(wrapper);
-
-//        int update = baseMapper.updateById(ucenterMember);
-//        if(update == 0) {
-//            throw new MSException(20001,"修改密码失败");
-//        }
-
-        //数据添加数据库中
-//        UcenterMember member = new UcenterMember();
-//        member.setEmail(email);
-        member.setPassword(MD5.encrypt(password));//密码需要进行MD5加密
-        baseMapper.updateById(member);
-
-
+        return baseMapper.selectCount(wrapper) > 0;
     }
 
-    //根据邮箱和手机号获取验证码
+    //更改密码
     @Override
-    public String getValidateCodeByEmailOrMobile(String emailOrMobile) {
-        return redisTemplate.opsForValue().get(emailOrMobile);
+    public void changePwd(ChangePwdVo changePwdVo) {
+        //获取注册的数据 校验参数
+        String id = changePwdVo.getId(); //用户id
+        String mobile = changePwdVo.getMobile(); //手机号
+        String email = changePwdVo.getEmail(); //邮箱
+        String code = changePwdVo.getCode(); //验证码
+        String password = changePwdVo.getPassword(); //密码
+
+        //密码解密
+        try {
+            password = AESUtil.desEncrypt(password).trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String mobileOrEmail = "";
+        QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
+        UcenterMember ucenterMember = baseMapper.selectById(id);
+
+        //非空判断
+        if (!StringUtils.isEmpty(code)) {
+            if (!StringUtils.isEmpty(email)) {
+                mobileOrEmail = email;
+                if (!email.equals(ucenterMember.getEmail())) {
+                    throw new MSException(20001, "验证邮箱非本人邮箱");
+                }
+                wrapper.eq("email", email);
+            }
+            if (!StringUtils.isEmpty(mobile)) {
+                mobileOrEmail = mobile;
+                if (!mobile.equals(ucenterMember.getMobile())) {
+                    throw new MSException(20001, "验证手机号非本人手机号");
+                }
+                wrapper.eq("mobile", mobile);
+            }
+        }
+
+        //校验验证码
+        validateCode(mobileOrEmail, mobileOrEmail + "ChangePwd", code);
+
+        UcenterMember member = baseMapper.selectOne(wrapper);
+        member.setPassword(MD5.encrypt(password));//密码需要进行MD5加密
+        baseMapper.updateById(member);
+    }
+
+    @Override
+    public boolean changeMobileOrEmail(ChangeMobileOrEmailVo changeMobileOrEmailVo, String id) {
+        //获取修改邮箱手机号的信息 校验参数
+        String mobile = changeMobileOrEmailVo.getMobile(); //手机号
+        String email = changeMobileOrEmailVo.getEmail(); //邮箱
+        String code = changeMobileOrEmailVo.getCode(); //验证码
+
+        String mobileOrEmail = "";
+
+        //非空判断
+        if (!StringUtils.isEmpty(code)) {
+            if (!StringUtils.isEmpty(email)) {
+                mobileOrEmail = email;
+            }
+            if (!StringUtils.isEmpty(mobile)) {
+                mobileOrEmail = mobile;
+            }
+        }
+
+        //校验验证码
+        validateCode(mobileOrEmail, mobileOrEmail + "ChangeMobileOrEmail", code);
+
+        UcenterMember ucenterMember = baseMapper.selectById(id);
+        if (!StringUtils.isEmpty(email)) {
+            ucenterMember.setEmail(email);
+        }
+        if (!StringUtils.isEmpty(mobile)) {
+            ucenterMember.setMobile(mobile);
+        }
+        return baseMapper.updateById(ucenterMember) > 0;
+    }
+
+    @Override
+    public boolean validateSecurity(ChangeMobileOrEmailVo changeMobileOrEmailVo, String id) {
+        String mobile = changeMobileOrEmailVo.getMobile();
+        String code = changeMobileOrEmailVo.getCode();
+
+        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(code)) {
+            throw new MSException(20001, "校验失败!!!");
+        }
+
+        UcenterMember ucenterMember = baseMapper.selectById(id);
+        if (!mobile.equals(ucenterMember.getMobile())) {
+            throw new MSException(20001, "手机号验证错误!!!");
+        }
+
+        //校验验证码
+        validateCode(mobile, mobile + "ValidateSecurity", code);
+
+        return true;
     }
 
 

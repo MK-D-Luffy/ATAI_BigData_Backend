@@ -1,6 +1,7 @@
 package com.atai.competition.service;
 
 import com.atai.competition.entity.AtaiApplyMsg;
+import com.atai.competition.entity.AtaiProcessResult;
 import com.atai.competition.entity.AtaiUserCompetition;
 import com.atai.competition.entity.TeamName;
 import com.atai.competition.entity.frontVo.MyCompetition;
@@ -9,6 +10,7 @@ import com.atai.competition.entity.vo.TeamCompetition;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,4 +58,6 @@ public interface AtaiUserCompetitionService extends IService<AtaiUserCompetition
     void refuseMember(String senderId, String competitionId);
 
     List<TeamName> getReceivers(String competitionId, String senderId);
+
+    AtaiProcessResult runCode(String type, String code) throws IOException, InterruptedException;
 }

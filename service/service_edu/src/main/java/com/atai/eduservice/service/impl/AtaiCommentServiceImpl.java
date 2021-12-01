@@ -1,11 +1,9 @@
 package com.atai.eduservice.service.impl;
 
 import com.atai.eduservice.entity.AtaiComment;
-import com.atai.eduservice.entity.EduComment;
 import com.atai.eduservice.entity.frontvo.CommentFrontVo;
 import com.atai.eduservice.mapper.AtaiCommentMapper;
 import com.atai.eduservice.service.AtaiCommentService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

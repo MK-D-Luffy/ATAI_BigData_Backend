@@ -13,8 +13,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 会员表
- * 返回对象
+ * 全局声明,为其他微服务使用时提供UcenterMember对象
+ *
  * @author ZengJinming
  * @since 2020-03-09
  */
@@ -42,22 +42,25 @@ public class UcenterMemberOrder implements Serializable {
     @ApiModelProperty(value = "密码")
     private String password;
 
-    @ApiModelProperty(value = "昵称")
+    @ApiModelProperty (value = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "性别 1 女，2 男")
+    @ApiModelProperty (value = "性别 1 女，2 男")
     private Integer sex;
 
-    @ApiModelProperty(value = "年龄")
+    @ApiModelProperty (value = "年龄")
     private Integer age;
 
-    @ApiModelProperty(value = "用户头像")
+    @ApiModelProperty (value = "学历")
+    private String education;
+
+    @ApiModelProperty (value = "用户头像")
     private String avatar;
 
-    @ApiModelProperty(value = "用户签名")
+    @ApiModelProperty (value = "用户签名")
     private String sign;
 
-    @ApiModelProperty(value = "是否禁用 1（true）已禁用，  0（false）未禁用")
+    @ApiModelProperty (value = "是否禁用 1（true）已禁用，  0（false）未禁用")
     private Boolean isDisabled;
 
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")

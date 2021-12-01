@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -31,9 +31,9 @@ import java.util.List;
 @Api (description = "比赛管理")
 @RestController
 @RequestMapping ("/atitcompetition/atai-competition")
-@Slf4j
 public class AtaiCompetitionController {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AtaiCompetitionController.class);
     @Autowired
     private OssClient ossClient;
     @Autowired

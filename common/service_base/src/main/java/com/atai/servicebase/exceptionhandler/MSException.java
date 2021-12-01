@@ -11,16 +11,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor   //生成无参数构造
 public class MSException extends RuntimeException {
     private Integer code;//状态码
-    private String msg;//异常信息
+    private String message;//异常信息
 
     public MSException(String message, Integer code) {
-        super(message);
+        this.message = message;
         this.code = code;
     }
 
     public MSException(ResultCodeEnum resultCodeEnum) {
-        super(resultCodeEnum.getMessage());
+        this.message = resultCodeEnum.getMessage();
         this.code = resultCodeEnum.getCode();
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 
     @Override

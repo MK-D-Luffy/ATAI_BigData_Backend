@@ -1,26 +1,26 @@
 package com.atai.aclservice.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.util.Date;
-import java.io.Serializable;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
 /**
  * 权限
+ *
  * @author
  * @since 2020-04-16
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("acl_permission")
+@EqualsAndHashCode (callSuper = false)
+@Accessors (chain = true)
+@TableName ("acl_permission")
 @ApiModel(value="Permission对象", description="权限")
 public class Permission implements Serializable {
 

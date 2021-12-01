@@ -47,7 +47,6 @@ public class CompetitionExcelListener extends AnalysisEventListener<CompeletionR
         if (compeletionResult == null) {
             throw new MSException(20001, "文件数据为空");
         }
-//        System.out.println(JSON.toJSONString(compeletionResult));
         list.add(compeletionResult);
     }
 

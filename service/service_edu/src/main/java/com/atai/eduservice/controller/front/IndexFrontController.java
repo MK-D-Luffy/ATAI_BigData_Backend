@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Api(description="前台首页：热门成员；热门课程")
+@Api ("前台首页：热门成员；热门课程")
 @RestController
 @RequestMapping("/eduservice/indexfront")
 //@CrossOrigin
