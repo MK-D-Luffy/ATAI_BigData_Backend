@@ -1,7 +1,7 @@
 package com.atai.competition.service.impl;
 
 import com.atai.competition.entity.AtaiCompetition;
-import com.atai.competition.entity.frontVo.CompFrontVo;
+import com.atai.competition.entity.vo.CompetitionQuery;
 import com.atai.competition.mapper.AtaiCompetitionMapper;
 import com.atai.competition.service.AtaiCompetitionService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -27,46 +27,53 @@ import java.util.Map;
 public class AtaiCompetitionServiceImpl extends ServiceImpl<AtaiCompetitionMapper, AtaiCompetition> implements AtaiCompetitionService {
 
     @Override
-    public Map<String, Object> getCompetitionPageList(Page<AtaiCompetition> pageComp, CompFrontVo compFrontVo) {
+    public Map<String, Object> getCompetitionPageList(Page<AtaiCompetition> pageComp, CompetitionQuery competitionQuery) {
         QueryWrapper<AtaiCompetition> wrapper = new QueryWrapper<>();
 
         //判断条件值是否为空，不为空拼接
-        if (!StringUtils.isEmpty(compFrontVo.getLevel())) { //分类
-            wrapper.eq("level", compFrontVo.getLevel());
+        if (!StringUtils.isEmpty((competitionQuery.getName()))) {//关键字
+            wrapper.like("name", competitionQuery.getName());
         }
-        if (!StringUtils.isEmpty((compFrontVo.getName()))) {//关键字
-            wrapper.like("name", compFrontVo.getName());
+        if (!StringUtils.isEmpty(competitionQuery.getLevel())) { //分类
+            wrapper.eq("level", competitionQuery.getLevel());
+        }
+        if (!StringUtils.isEmpty(competitionQuery.getTech())) { //分类
+            wrapper.eq("tech", competitionQuery.getTech());
         }
 
         Date date = new Date();
-        if (compFrontVo.getActive()) {
+        if (competitionQuery.getStatus() == 1) {
             wrapper.gt("deadline", date);
+        } else if (competitionQuery.getStatus() == 2) {
+            wrapper.lt("deadline", date);
         }
 
-        if (!StringUtils.isEmpty(compFrontVo.getHotSort())) { //关注度
-            if ("1".equals(compFrontVo.getHotSort())) {
-                wrapper.orderByDesc("participants");
-            } else {
-                wrapper.orderByAsc("participants");
-            }
+        if ("最新".equals(competitionQuery.getSort())) {
+            wrapper.orderByAsc("gmt_create");
+        } else if ("最热".equals(competitionQuery.getSort())) {
+            wrapper.orderByDesc("participants");
         }
-        if (!StringUtils.isEmpty(compFrontVo.getGmtCreateSort())) { //最新
-            if ("1".equals(compFrontVo.getGmtCreateSort())) {
-                wrapper.orderByDesc("gmt_create");
-            } else {
-                wrapper.orderByAsc("gmt_create");
-            }
-        } else {
-            //默认按发布时间降序
-            wrapper.orderByDesc("gmt_create");
-        }
-        if (!StringUtils.isEmpty(compFrontVo.getPriceSort())) {//价格
-            if ("1".equals(compFrontVo.getPriceSort())) {
-                wrapper.orderByDesc("money");
-            } else {
-                wrapper.orderByAsc("money");
-            }
-        }
+//        if (!StringUtils.isEmpty(competitionQuery.getHotSort())) { //关注度
+//            if ("1".equals(competitionQuery.getHotSort())) {
+//                wrapper.orderByDesc("participants");
+//            } else {
+//                wrapper.orderByAsc("participants");
+//            }
+//        }
+//        if (!StringUtils.isEmpty(competitionQuery.getGmtCreateSort())) { //最新
+//            if ("1".equals(competitionQuery.getGmtCreateSort())) {
+//                wrapper.orderByDesc("gmt_create");
+//            } else {
+//                wrapper.orderByAsc("gmt_create");
+//            }
+//        }
+//        if (!StringUtils.isEmpty(competitionQuery.getPriceSort())) {//价格
+//            if ("1".equals(competitionQuery.getPriceSort())) {
+//                wrapper.orderByDesc("money");
+//            } else {
+//                wrapper.orderByAsc("money");
+//            }
+//        }
 
         //把分页数据封装到pageComp对象里去
         baseMapper.selectPage(pageComp, wrapper);

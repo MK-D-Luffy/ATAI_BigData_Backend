@@ -3,21 +3,17 @@ package com.atai.competition.controller;
 import com.atai.commonutils.result.R;
 import com.atai.competition.client.OssClient;
 import com.atai.competition.entity.AtaiCompetition;
-import com.atai.competition.entity.vo.AtaiCompetitionReturn;
 import com.atai.competition.entity.vo.CompetitionQuery;
 import com.atai.competition.service.AtaiCompetitionService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -41,12 +37,24 @@ public class AtaiCompetitionController {
 
     //1 查询比赛表所有数据getUserCompetition
     //rest风格
-    @ApiOperation (value = "所有比赛列表")
+/*    @ApiOperation (value = "所有比赛列表")
     @GetMapping ("findAll")
     public R findAllCompetition() {
         //调用service的方法实现查询所有的操作
         List<AtaiCompetition> list = ataiCompetitionService.list(null);
         return R.success().data("items", list);
+    }*/
+
+    //1 分页查询比赛的方法
+    @ApiOperation (value = "条件查询带分页查询比赛")
+    @PostMapping ("pageCompetitionCondition/{current}/{limit}")
+    public R getCompetitionPageList(@PathVariable long current, @PathVariable long limit,
+                                    @RequestBody (required = false) CompetitionQuery competitionQuery) {
+
+        Page<AtaiCompetition> compPage = new Page<>(current, limit);
+        Map<String, Object> map = ataiCompetitionService.getCompetitionPageList(compPage, competitionQuery);
+        //返回分页所有数据
+        return R.success().data(map);
     }
 
 
@@ -71,31 +79,28 @@ public class AtaiCompetitionController {
         }
     }
 
-    //3 分页查询比赛的方法
-    //current 当前页
-    //limit 每页记录数
-    @ApiOperation (value = "分页查询")
-    @GetMapping ("pageCompetition/{current}/{limit}")
-    public R pageListCompetition(@PathVariable long current,
-                                 @PathVariable long limit) {
-        //创建page对象
-        Page<AtaiCompetition> pageCompetition = new Page<>(current, limit);
-        //调用方法实现分页
-        //调用方法时候，底层封装，把分页所有数据封装到pageTeacher对象里面
-        ataiCompetitionService.page(pageCompetition, null);
-        long total = pageCompetition.getTotal();//总记录数
-        List<AtaiCompetition> records = pageCompetition.getRecords(); //数据list集合
-        return R.success().data("total", total).data("records", records);
-    }
+//    //3 分页查询比赛的方法
+//    //current 当前页
+//    //limit 每页记录数
+//    @ApiOperation (value = "分页查询")
+//    @GetMapping ("pageCompetition/{current}/{limit}")
+//    public R pageListCompetition(@PathVariable long current,
+//                                 @PathVariable long limit) {
+//        //创建page对象
+//        Page<AtaiCompetition> pageCompetition = new Page<>(current, limit);
+//        //调用方法实现分页
+//        //调用方法时候，底层封装，把分页所有数据封装到pageTeacher对象里面
+//        ataiCompetitionService.page(pageCompetition, null);
+//        long total = pageCompetition.getTotal();//总记录数
+//        List<AtaiCompetition> records = pageCompetition.getRecords(); //数据list集合
+//        return R.success().data("total", total).data("records", records);
+//    }
 
 
     //4 添加比赛接口的方法
     @ApiOperation (value = "添加比赛")
     @PostMapping ("addCompetition")
-    public R addCompetition(@RequestBody AtaiCompetitionReturn AtaiCompetition) {
-        AtaiCompetition ataiCompetition = new AtaiCompetition();
-        //拷贝
-        BeanUtils.copyProperties(AtaiCompetition, ataiCompetition);
+    public R addCompetition(@RequestBody AtaiCompetition ataiCompetition) {
         boolean save = ataiCompetitionService.save(ataiCompetition);
         if (save) {
             return R.success();
@@ -124,43 +129,43 @@ public class AtaiCompetitionController {
         }
     }
 
-    //7 条件查询带分页的方法
-    @ApiOperation (value = "分页查询带条件")
-    @PostMapping ("pageCompetitionCondition/{current}/{limit}")
-    public R pageCompetitionCondition(@PathVariable long current, @PathVariable long limit,
-                                      @RequestBody (required = false) CompetitionQuery cmpetitionQuery) {  //@RequestBody(required = false)参数值可以为空
-        //创建page对象
-        Page<AtaiCompetition> pageCompetition = new Page<>(current, limit);
-
-        //构建条件
-        QueryWrapper<AtaiCompetition> wrapper = new QueryWrapper<>();
-
-        // 多条件组合查询
-        // mybatis学过 动态sql
-        String name = cmpetitionQuery.getName();
-        String level = cmpetitionQuery.getLevel();
-        String begin = cmpetitionQuery.getBegin();
-        String end = cmpetitionQuery.getEnd();
-        //判断条件值是否为空，如果不为空拼接条件
-        if (!StringUtils.isEmpty(name)) {
-            //构建条件
-            wrapper.like("name", name);
-        }
-        if (!StringUtils.isEmpty(level)) {
-            wrapper.eq("level", level);
-        }
-        if (!StringUtils.isEmpty(begin)) {
-            wrapper.ge("gmt_create", begin);
-        }
-        if (!StringUtils.isEmpty(end)) {
-            wrapper.le("gmt_create", end);
-        }
-        //排序
-        wrapper.orderByDesc("gmt_create");
-        //调用方法实现条件查询分页
-        ataiCompetitionService.page(pageCompetition, wrapper);
-        long total = pageCompetition.getTotal();//总记录数
-        List<AtaiCompetition> records = pageCompetition.getRecords(); //数据list集合
-        return R.success().data("total", total).data("records", records);
-    }
+//    //7 条件查询带分页的方法
+//    @ApiOperation (value = "分页查询带条件")
+//    @PostMapping ("pageCompetitionCondition/{current}/{limit}")
+//    public R pageCompetitionCondition(@PathVariable long current, @PathVariable long limit,
+//                                      @RequestBody (required = false) CompetitionQuery competitionQuery) {  //@RequestBody(required = false)参数值可以为空
+//        //创建page对象
+//        Page<AtaiCompetition> pageCompetition = new Page<>(current, limit);
+//
+//        //构建条件
+//        QueryWrapper<AtaiCompetition> wrapper = new QueryWrapper<>();
+//
+//        // 多条件组合查询
+//        // mybatis学过 动态sql
+//        String name = competitionQuery.getName();
+//        String level = competitionQuery.getLevel();
+//        String begin = competitionQuery.getBegin();
+//        String end = competitionQuery.getEnd();
+//        //判断条件值是否为空，如果不为空拼接条件
+//        if (!StringUtils.isEmpty(name)) {
+//            //构建条件
+//            wrapper.like("name", name);
+//        }
+//        if (!StringUtils.isEmpty(level)) {
+//            wrapper.eq("level", level);
+//        }
+//        if (!StringUtils.isEmpty(begin)) {
+//            wrapper.ge("gmt_create", begin);
+//        }
+//        if (!StringUtils.isEmpty(end)) {
+//            wrapper.le("gmt_create", end);
+//        }
+//        //排序
+//        wrapper.orderByDesc("gmt_create");
+//        //调用方法实现条件查询分页
+//        ataiCompetitionService.page(pageCompetition, wrapper);
+//        long total = pageCompetition.getTotal();//总记录数
+//        List<AtaiCompetition> records = pageCompetition.getRecords(); //数据list集合
+//        return R.success().data("total", total).data("records", records);
+//    }
 }

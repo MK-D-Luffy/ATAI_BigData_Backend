@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Api ("上传文件")
 @RestController
-@RequestMapping ("/eduoss/fileoss")
+@RequestMapping ("/ataioss/fileoss")
 //@CrossOrigin
 public class OssController {
     @Autowired
@@ -34,7 +34,7 @@ public class OssController {
 
     // 上传文件(数据集、结果集和头像)到oss
     @ApiOperation (value = "上传文件(数据集、结果集和头像)的方法")
-    @PostMapping
+    @PostMapping (value = "/upload")
     public R uploadOssFile(MultipartFile file) {
         //获取上传文件  MultipartFile
         //返回上传到oss的路径

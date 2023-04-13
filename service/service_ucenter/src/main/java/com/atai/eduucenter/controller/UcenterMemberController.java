@@ -13,14 +13,17 @@ import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
 import com.atai.eduucenter.service.UcenterMemberService;
 import com.atai.servicebase.exceptionhandler.MSException;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * 会员表 前端控制器
@@ -139,12 +142,12 @@ public class UcenterMemberController {
     }
 
     //查询某天注册人数
-    @ApiOperation (value = "查询某天注册人数")
-    @GetMapping ("countRegister/{day}")
-    public R countRegister(@PathVariable String day) {
-        Integer count = ucenterMemberService.countRegisterDay(day);
-        return R.success().data("countRegister", count);
-    }
+//    @ApiOperation (value = "查询某天注册人数")
+//    @GetMapping ("countRegister/{day}")
+//    public R countRegister(@PathVariable String day) {
+//        Integer count = ucenterMemberService.countRegisterDay(day);
+//        return R.success().data("countRegister", count);
+//    }
 
     //修改邮箱或手机号
     @ApiOperation (value = "修改邮箱或手机号")
@@ -172,4 +175,29 @@ public class UcenterMemberController {
         }
     }
 
+    //分页查询用户的方法
+    @ApiOperation (value = "条件查询带分页查询比赛")
+    @PostMapping ("getUserListPage/{page}/{limit}")
+    public R getUserListPage(@PathVariable long page, @PathVariable long limit) {
+
+        Page<UcenterMember> compPage = new Page<>(page, limit);
+        Map<String, Object> map = ucenterMemberService.getUserListPage(compPage);
+        //返回分页所有数据
+        return R.success().data(map);
+    }
+
+    //逻辑删除比赛的方法
+    @ApiOperation (value = "逻辑删除比赛")
+    @DeleteMapping ("/{id}")
+    public R removeCompetition(@ApiParam (name = "id", value = "比赛ID", required = true)
+                               @PathVariable String id) {
+        // 将Mysql中的删除
+        Boolean flag = ucenterMemberService.removeById(id);
+
+        if (flag) {
+            return R.success();
+        } else {
+            return R.error();
+        }
+    }
 }

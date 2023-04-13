@@ -5,11 +5,15 @@ import com.atai.eduucenter.entity.vo.ChangeMobileOrEmailVo;
 import com.atai.eduucenter.entity.vo.ChangePwdVo;
 import com.atai.eduucenter.entity.vo.LoginVo;
 import com.atai.eduucenter.entity.vo.RegisterVo;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Map;
+
 /**
  * 会员表 服务类
+ *
  * @author ZengJinming
  * @since 2020-04-09
  */
@@ -25,7 +29,7 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     UcenterMember getOpenIdMember(String openid);
 
     //查询某天注册人数
-    Integer countRegisterDay(String day);
+//    Integer countRegisterDay(String day);
 
     //判断昵称是否重复
     Boolean checkNickname(@PathVariable String nickname);
@@ -42,4 +46,6 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     boolean changeMobileOrEmail(ChangeMobileOrEmailVo changeMobileOrEmailVo, String id);
 
     boolean validateSecurity(ChangeMobileOrEmailVo changeMobileOrEmailVo, String id);
+
+    Map<String, Object> getUserListPage(Page<UcenterMember> compPage);
 }

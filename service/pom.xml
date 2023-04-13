@@ -13,11 +13,11 @@
     <packaging>pom</packaging>
     <modules>
         <module>atai_service_competition</module>
-        <module>service_edu</module>
+        <module>service_atai</module>
         <module>service_oss</module>
         <module>service_msm</module>
         <module>service_ucenter</module>
-        <module>service_sta</module>
+        <!--        <module>service_sta</module>-->
         <module>service_acl</module>
     </modules>
 
@@ -26,6 +26,11 @@
             <groupId>com.atai</groupId>
             <artifactId>service_base</artifactId>
             <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
 
         <!--包含了 sleuth+zipkin -->
@@ -73,7 +78,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-
         <!-- velocity 模板引擎, Mybatis Plus 代码生成器需要 -->
         <dependency>
             <groupId>org.apache.velocity</groupId>

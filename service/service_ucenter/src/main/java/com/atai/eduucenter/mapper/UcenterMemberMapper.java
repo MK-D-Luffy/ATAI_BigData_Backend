@@ -11,5 +11,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface UcenterMemberMapper extends BaseMapper<UcenterMember> {
 
     //查询某天注册人数
-    Integer countRegister(String day);
+//    Integer countRegister(String day);
 }

@@ -1,7 +1,7 @@
 package com.atai.competition.service;
 
 import com.atai.competition.entity.AtaiCompetition;
-import com.atai.competition.entity.frontVo.CompFrontVo;
+import com.atai.competition.entity.vo.CompetitionQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public interface AtaiCompetitionService extends IService<AtaiCompetition> {
     //1   分页查询比赛的方法
-    Map<String, Object> getCompetitionPageList(Page<AtaiCompetition> compPage, CompFrontVo compFrontVo);
+    Map<String, Object> getCompetitionPageList(Page<AtaiCompetition> compPage, CompetitionQuery competitionQuery);
 
 
 }

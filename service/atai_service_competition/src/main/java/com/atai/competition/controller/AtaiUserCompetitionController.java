@@ -164,7 +164,6 @@ public class AtaiUserCompetitionController {
         } catch (Exception e) {
             return R.error().code(20001).message("上传失败");
         }
-
     }
 
     //6.根据比赛id，查询根据比赛id，token(用户id)查询信息
@@ -219,7 +218,7 @@ public class AtaiUserCompetitionController {
             return R.error().code(28004).message("登录已过期，请重新登录");
         }
         String userId = jwtToken.getId();
-
+        System.out.println("userId = " + userId);
         List<MyCompetition> data = ataiUserCompetitionService.getMyCompetitionList(userId);
         return R.success().data("data", data);
     }

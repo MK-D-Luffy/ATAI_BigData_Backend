@@ -38,12 +38,6 @@ public class User implements Serializable {
     @ApiModelProperty(value = "昵称")
     private String nickName;
 
-    @ApiModelProperty(value = "用户头像")
-    private String salt;
-
-    @ApiModelProperty(value = "用户签名")
-    private String token;
-
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic
     private Boolean isDeleted;

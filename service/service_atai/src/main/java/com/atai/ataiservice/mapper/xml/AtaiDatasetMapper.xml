@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atai.ataiservice.mapper.AtaiDatasetMapper">
+    <!--    <resultMap id="BaseResultMap" type="com.atai.ataiservice.entity.AtaiDataset">
+            <id column="id" jdbcType="INTEGER" property="id"/>
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+            <result column="describe" jdbcType="VARCHAR" property="intro"/>
+            <result column="images" jdbcType="VARCHAR" property="category"
+                    typeHandler="com.atai.ataiservice.handler.JsonStringArrayTypeHandler"/>
+            <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+            <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+            <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        </resultMap>-->
+
+    <!--    <insert id="insert" parameterType="com.atai.ataiservice.entity.AtaiDataset">
+            <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+                SELECT LAST_INSERT_ID()
+            </selectKey>
+            INSERT INTO `atai_dataset`(`id`, `user_id`, `name`, `intro`, `dataset`, `category`, `is_deleted`, `gmt_create`, `gmt_modified`)
+            values (#{id,jdbcType=VARCHAR},
+            #{userId,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR}, #{intro,jdbcType=VARCHAR},
+            #{dataset,jdbcType=VARCHAR},
+            #{category,jdbcType=VARCHAR,typeHandler=com.atai.ataiservice.handler.JsonStringArrayTypeHandler},
+            #{isDeleted,jdbcType=BIT},
+            #{gmtCreate,jdbcType=TIMESTAMP},
+            #{gmtModified,jdbcType=TIMESTAMP}
+            )
+        </insert>-->
+</mapper>

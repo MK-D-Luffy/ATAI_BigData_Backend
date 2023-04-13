@@ -90,6 +90,9 @@ public class AtaiUserCompetitionServiceImpl extends ServiceImpl<AtaiUserCompetit
             //调用方法进行读取,官方结果集
 
             String fileName = multipartFile.getOriginalFilename();
+
+            System.out.println("fileName = " + fileName);
+
             assert fileName != null;
             if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
                 // 读取map集合

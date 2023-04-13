@@ -1,8 +1,10 @@
 package com.atai.competition.entity.vo;
 
 import com.atai.commonutils.ordervo.UcenterMemberOrder;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -18,6 +20,8 @@ public class TeamCompetition {
     private Double score;
 
     @ApiModelProperty (value = "最优日期提交日")
+    @JsonFormat (timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat (pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deadline;
 
     @ApiModelProperty (value = "队友信息")

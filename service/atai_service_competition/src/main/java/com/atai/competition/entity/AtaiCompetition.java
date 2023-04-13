@@ -12,14 +12,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * <p>
- * 比赛
- * </p>
- *
- * @author linshengbin
- * @since 2021-01-08
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -35,7 +27,7 @@ public class AtaiCompetition implements Serializable {
     @ApiModelProperty(value = "比赛名称")
     private String name;
 
-    @ApiModelProperty(value = "比赛简介")
+    @ApiModelProperty (value = "比赛简介")
     private String intro;
 
     @ApiModelProperty (value = "赛题描述")
@@ -43,6 +35,9 @@ public class AtaiCompetition implements Serializable {
 
     @ApiModelProperty (value = "比赛类型")
     private String level;
+
+    @ApiModelProperty (value = "比赛要求技术")
+    private String tech;
 
     @ApiModelProperty (value = "参赛人数")
     private Long participants;
