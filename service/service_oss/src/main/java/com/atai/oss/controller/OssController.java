@@ -34,11 +34,12 @@ public class OssController {
 
     // 上传文件(数据集、结果集和头像)到oss
     @ApiOperation (value = "上传文件(数据集、结果集和头像)的方法")
-    @PostMapping (value = "/upload")
+    @PostMapping (value = "upload")
     public R uploadOssFile(MultipartFile file) {
         //获取上传文件  MultipartFile
         //返回上传到oss的路径
         String url = ossService.uploadFile(file, redisTemplate);
+        System.out.println("url = " + url);
         return R.success().data("url", url);
     }
 

@@ -26,4 +26,7 @@ public interface AtaiDatasetService extends IService<AtaiDataset> {
     Map<String, Object> getDatasetPageList(Page<AtaiDataset> datasetPage, DatasetQuery datasetQuery);
 
 
+    List<AtaiDataset> getHotDatasets();
+
+    List<AtaiDataset> getUserDatasets(String userId);
 }

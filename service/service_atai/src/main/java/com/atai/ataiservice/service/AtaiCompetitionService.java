@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,4 +22,8 @@ public interface AtaiCompetitionService extends IService<AtaiCompetition> {
     Map<String, Object> getCompetitionPageList(Page<AtaiCompetition> compPage, CompetitionQuery competitionQuery);
 
     void submit(MultipartFile file, String competitionId, String teamId, String userId);
+
+    List<AtaiCompetition> getLargeCompetition();
+
+    List<AtaiCompetition> getListByUserId(String userId);
 }

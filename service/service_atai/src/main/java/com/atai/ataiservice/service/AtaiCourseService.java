@@ -23,4 +23,8 @@ public interface AtaiCourseService extends IService<AtaiCourse> {
 
     //分页查询比赛的方法
     Map<String, Object> getCoursePageList(Page<AtaiCourse> coursePage, CourseQuery courseQuery);
+
+    List<AtaiCourse> getHotCourses();
+
+    List<AtaiCourse> getListByUserId(String userId);
 }

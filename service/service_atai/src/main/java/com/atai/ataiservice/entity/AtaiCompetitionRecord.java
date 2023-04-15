@@ -28,6 +28,11 @@ public class AtaiCompetitionRecord extends Model<AtaiCompetitionRecord> {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty (value = "提交的文件名")
+    private String filename;
+    @ApiModelProperty (value = "提交的文件地址")
+    private String submitUrl;
+
     @TableId (value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
@@ -40,14 +45,25 @@ public class AtaiCompetitionRecord extends Model<AtaiCompetitionRecord> {
     @ApiModelProperty (value = "用户id")
     private String userId;
 
-    @ApiModelProperty (value = "提交的文件")
-    private String file;
+    public AtaiCompetitionRecord() {
+    }
+
+    public AtaiCompetitionRecord(String id, String competitionId, String teamId, String userId, String filename,
+                                 String submitUrl, Double score, Integer isDeleted, Date gmtCreate, Date gmtModified) {
+        this.id = id;
+        this.competitionId = competitionId;
+        this.teamId = teamId;
+        this.userId = userId;
+        this.filename = filename;
+        this.submitUrl = submitUrl;
+        this.score = score;
+        this.isDeleted = isDeleted;
+        this.gmtCreate = gmtCreate;
+        this.gmtModified = gmtModified;
+    }
 
     @ApiModelProperty (value = "得分")
     private Double score;
-
-    @ApiModelProperty (value = "备注")
-    private String comment;
 
     @ApiModelProperty (value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

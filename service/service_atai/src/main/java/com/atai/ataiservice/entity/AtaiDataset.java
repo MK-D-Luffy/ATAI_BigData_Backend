@@ -45,7 +45,7 @@ public class AtaiDataset extends Model<AtaiDataset> {
     private String intro;
 
     @ApiModelProperty (value = "数据集路径")
-    private String dataset;
+    private String url;
 
     @ApiModelProperty (value = "数据集类别")
     private String category;

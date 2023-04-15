@@ -60,11 +60,17 @@ public class AtaiCompetition extends Model<AtaiCompetition> {
     @ApiModelProperty (value = "可提交次数")
     private Integer submitCounts;
 
+    @ApiModelProperty (value = "提交文件的类型 1代码 0结果文件")
+    private Integer submitType;
+
     @ApiModelProperty (value = "结果集数据路径")
     private String result;
 
     @ApiModelProperty (value = "赛题数据路径")
     private String cover;
+
+    @ApiModelProperty (value = "是否为大型赛事")
+    private Integer isLarge;
 
     @ApiModelProperty (value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic

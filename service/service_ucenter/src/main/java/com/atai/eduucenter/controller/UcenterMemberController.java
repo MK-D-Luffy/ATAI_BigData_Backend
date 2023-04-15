@@ -41,7 +41,7 @@ public class UcenterMemberController {
     UcenterMemberService ucenterMemberService;
 
     //登录
-    @ApiOperation (value = "会员登录")
+    @ApiOperation (value = "用户登录")
     @PostMapping ("login")
     public R login(@RequestBody LoginVo loginVo) {
         String token;
@@ -56,7 +56,7 @@ public class UcenterMemberController {
     }
 
     //注册
-    @ApiOperation (value = "会员注册")
+    @ApiOperation (value = "用户注册")
     @PostMapping ("register")
     public R registerUser(@RequestBody RegisterVo registerVo) {
         ucenterMemberService.register(registerVo);

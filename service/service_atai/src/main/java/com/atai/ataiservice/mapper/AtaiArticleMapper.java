@@ -1,15 +1,13 @@
 package com.atai.ataiservice.mapper;
 
 import com.atai.ataiservice.entity.AtaiArticle;
-import com.atai.ataiservice.entity.frontvo.ArticleContentFront;
+import com.atai.ataiservice.entity.frontvo.ArticleBodyFrontVo;
 import com.atai.ataiservice.entity.frontvo.ArticleFrontVo;
 import com.atai.ataiservice.entity.vo.ArticleQuery;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * <p>
@@ -21,7 +19,6 @@ import java.util.List;
  */
 public interface AtaiArticleMapper extends BaseMapper<AtaiArticle> {
 
-    List<ArticleFrontVo> findAll();
 
     IPage<ArticleFrontVo> findAllArticleCondition(@Param("page")Page<ArticleFrontVo> page, @Param("articleQuery") ArticleQuery articleQuery);
 
@@ -32,6 +29,6 @@ public interface AtaiArticleMapper extends BaseMapper<AtaiArticle> {
     Boolean addArticleComments(String id);
 
     //查询
-    ArticleContentFront getArticleById(String id);
+    ArticleBodyFrontVo getArticleById(String id);
 
 }

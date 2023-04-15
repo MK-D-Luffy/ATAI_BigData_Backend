@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FeignClient ("service-oss")
 public interface OssClient {
 
-    @PostMapping (value = "/upload", consumes = "multipart/form-data")
+    @PostMapping (value = "/ataioss/fileoss/upload", consumes = "multipart/form-data")
     public R uploadOssFile(MultipartFile file);
 
     @PostMapping ("/ataioss/fileoss/get")

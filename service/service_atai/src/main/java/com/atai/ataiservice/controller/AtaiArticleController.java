@@ -3,8 +3,7 @@ package com.atai.ataiservice.controller;
 
 import com.atai.ataiservice.entity.AtaiArticle;
 import com.atai.ataiservice.entity.AtaiArticleBody;
-import com.atai.ataiservice.entity.frontvo.ArticleContentFront;
-import com.atai.ataiservice.entity.frontvo.ArticleFrontVo;
+import com.atai.ataiservice.entity.frontvo.ArticleBodyFrontVo;
 import com.atai.ataiservice.entity.frontvo.ArticlePublish;
 import com.atai.ataiservice.entity.vo.ArticleQuery;
 import com.atai.ataiservice.service.AtaiArticleBodyService;
@@ -13,7 +12,6 @@ import com.atai.commonutils.result.R;
 import com.atai.commonutils.util.JwtInfo;
 import com.atai.commonutils.util.JwtUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.Api;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -48,22 +47,14 @@ public class AtaiArticleController {
 
     //1 分页条件查询文章列表
     //rest风格
-    @ApiOperation(value = "分页条件查询文章列表")
-    @PostMapping("pageArticleCondition/{current}/{limit}")
-    public R findAllArticleCondition(@PathVariable long current, @PathVariable long limit,
-                                     @RequestBody(required = false)  ArticleQuery articleQuery) {
-        Page<ArticleFrontVo> pageArticle = new Page<>(current,limit);
-        IPage<ArticleFrontVo> result = ataiArticleService.findAllArticleCondition(pageArticle,articleQuery);
-        List<ArticleFrontVo> list = result.getRecords();
-        boolean hasNext = result.getTotal()>current*limit?true:false;//下一页
-        boolean hasPrevious = current>1?true:false;//上一页
-        //调用service的方法实现查询所有的操作
-        return R.success().data("total",result.getTotal())
-                .data("records",list).data("current",result.getCurrent())
-                .data("pages",result.getPages())
-                .data("hasNext",hasNext)
-                .data("hasPrevious",hasPrevious);
-
+    @ApiOperation (value = "分页条件查询文章列表")
+    @PostMapping ("pageArticle/{page}/{limit}")
+    public R pageArticle(@PathVariable long page, @PathVariable long limit,
+                         @RequestBody (required = false) ArticleQuery articleQuery) {
+        Page<AtaiArticle> articlePage = new Page<>(page, limit);
+        Map<String, Object> map = ataiArticleService.getArticlePageList(articlePage, articleQuery);
+        //返回分页所有数据
+        return R.success().data(map);
     }
 
     //2 文章id查询文章内容
@@ -71,7 +62,7 @@ public class AtaiArticleController {
     @ApiOperation(value = "文章id查询文章内容")
     @GetMapping("getArticleById/{id}")
     public R getArticleById(@PathVariable String id) {
-        ArticleContentFront articleContentFront = ataiArticleService.getArticleById(id);
+        ArticleBodyFrontVo articleContentFront = ataiArticleService.getArticleById(id);
         return R.success().data("data",articleContentFront);
     }
 
@@ -110,7 +101,7 @@ public class AtaiArticleController {
                 .data("hasNext",hasNext).data("hasPrevious",hasPrevious);
     }
 
-    //2 逻辑删除公告
+    //2 逻辑删除文章
     @ApiOperation(value = "逻辑删除文章")
     @GetMapping("removeArticle/{id}")
     public R removeArticle(@ApiParam(name = "id",value = "文章id",required = true)

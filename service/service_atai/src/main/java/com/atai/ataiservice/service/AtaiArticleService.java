@@ -1,14 +1,12 @@
 package com.atai.ataiservice.service;
 
 import com.atai.ataiservice.entity.AtaiArticle;
-import com.atai.ataiservice.entity.frontvo.ArticleContentFront;
-import com.atai.ataiservice.entity.frontvo.ArticleFrontVo;
+import com.atai.ataiservice.entity.frontvo.ArticleBodyFrontVo;
 import com.atai.ataiservice.entity.vo.ArticleQuery;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,12 +18,10 @@ import java.util.List;
  */
 public interface AtaiArticleService extends IService<AtaiArticle> {
 
-    List<ArticleFrontVo> findAll();
-
-    IPage<ArticleFrontVo> findAllArticleCondition(Page<ArticleFrontVo> pageArticle, ArticleQuery wrapper);
-
-    ArticleContentFront getArticleById(String id);
+    ArticleBodyFrontVo getArticleById(String id);
 
     //评论数+1
     Boolean addArticleComments(String id);
+
+    Map<String, Object> getArticlePageList(Page<AtaiArticle> articlePage, ArticleQuery articleQuery);
 }

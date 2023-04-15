@@ -22,18 +22,18 @@ import java.util.Date;
  * @since 2021-04-14
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@ApiModel(value="ArticleContentFront对象", description="文章")
-public class ArticleContentFront implements Serializable {
+@EqualsAndHashCode (callSuper = false)
+@Accessors (chain = true)
+@ApiModel (value = "ArticleContentFront对象", description = "文章")
+public class ArticleBodyFrontVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "文章ID")
-    @TableId(value = "id", type = IdType.ID_WORKER_STR)
+    @ApiModelProperty (value = "文章ID")
+    @TableId (value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
-    @ApiModelProperty(value = "摘要")
+    @ApiModelProperty (value = "摘要")
     private String summary;
 
     @ApiModelProperty(value = "标题")
@@ -44,12 +44,6 @@ public class ArticleContentFront implements Serializable {
 
     @ApiModelProperty(value = "浏览数")
     private Integer viewCounts;
-
-    @ApiModelProperty(value = "权重")
-    private Integer weight;
-
-    @ApiModelProperty(value = "标签列表")
-    private String tag;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
@@ -71,9 +65,5 @@ public class ArticleContentFront implements Serializable {
 
     @ApiModelProperty(value = "内容id")
     private String contentId;
-
-    @ApiModelProperty(value = "文章分类")
-    private String category;
-
 
 }

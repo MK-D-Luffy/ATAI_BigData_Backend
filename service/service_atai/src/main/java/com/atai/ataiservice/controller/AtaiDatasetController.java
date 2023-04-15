@@ -61,8 +61,8 @@ public class AtaiDatasetController {
         return R.success().data(map);
     }
 
-    //4 比赛修改功能
-    @ApiOperation (value = "比赛修改")
+    //4 修改数据集功能
+    @ApiOperation (value = "数据集修改")
     @PostMapping ("updateDataset")
     public R updateDataset(@RequestBody AtaiDataset ataiDataset) {
         ataiDataset.setGmtModified(DateUtil.date());
@@ -74,8 +74,8 @@ public class AtaiDatasetController {
         }
     }
 
-    //5 添加比赛接口的方法
-    @ApiOperation (value = "添加比赛")
+    //5 添加数据集接口的方法
+    @ApiOperation (value = "添加数据集")
     @PostMapping ("addDataset")
     public R addDataset(@RequestBody AtaiDataset ataiDataset) {
         ataiDataset.setIsDeleted(0);
@@ -87,13 +87,13 @@ public class AtaiDatasetController {
         }
     }
 
-    //6 逻辑删除比赛的方法
-    @ApiOperation (value = "逻辑删除比赛")
+    //6 逻辑删除数据集的方法
+    @ApiOperation (value = "逻辑删除数据集")
     @DeleteMapping ("/{id}")
     public R removeDataset(@ApiParam (name = "id", value = "比赛ID", required = true)
                            @PathVariable String id) {
         AtaiDataset ataiDataset = ataiDatasetService.getById(id);
-        String datasetUrl = ataiDataset.getDataset();
+        String datasetUrl = ataiDataset.getUrl();
         if (datasetUrl != null) {
             // 将OSS服务器和Redis中的数据删除
             ossClient.removeFile(datasetUrl);
@@ -108,6 +108,23 @@ public class AtaiDatasetController {
         }
     }
 
+    //=====================================================================
+    //===============================其他===============================
+    //=====================================================================
+
+    @ApiOperation (value = "根据用户id查询我发布的数据集")
+    @GetMapping ("getUserDatasets/{userId}")
+    public R getUserDatasets(@PathVariable String userId) {
+        List<AtaiDataset> userDatasets = ataiDatasetService.getUserDatasets(userId);
+        return R.success().data("userDatasets", userDatasets);
+    }
+
+    @ApiOperation (value = "根据用户id和课程id判断是否已报名")
+    @GetMapping ("getHotDatasets")
+    public R getHotDatasets() {
+        List<AtaiDataset> hotDatasets = ataiDatasetService.getHotDatasets();
+        return R.success().data("hotDatasets", hotDatasets);
+    }
 
 }
 

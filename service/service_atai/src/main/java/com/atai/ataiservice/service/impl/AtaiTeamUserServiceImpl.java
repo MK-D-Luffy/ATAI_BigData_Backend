@@ -59,4 +59,11 @@ public class AtaiTeamUserServiceImpl extends ServiceImpl<AtaiTeamUserMapper, Ata
         wrapper.eq("team_id", teamId);
         return baseMapper.selectList(wrapper);
     }
+
+    @Override
+    public List<AtaiTeamUser> getCompetitionByUserId(String userId) {
+        QueryWrapper<AtaiTeamUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        return baseMapper.selectList(wrapper);
+    }
 }

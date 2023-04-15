@@ -45,14 +45,8 @@ public class ArticleFrontVo implements Serializable {
     @ApiModelProperty(value = "浏览数")
     private Integer viewCounts;
 
-    @ApiModelProperty(value = "权重")
-    private Integer weight;
-
     @ApiModelProperty(value = "作者名称")
     private String nickname;
-
-    @ApiModelProperty(value = "标签列表")
-    private String tag;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)

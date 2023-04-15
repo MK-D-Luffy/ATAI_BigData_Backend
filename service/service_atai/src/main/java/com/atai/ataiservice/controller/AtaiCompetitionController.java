@@ -61,6 +61,15 @@ public class AtaiCompetitionController {
         return R.success().data(map);
     }
 
+    //2 查询大型比赛
+    @ApiOperation (value = "查询大型比赛")
+    @GetMapping ("getLargeCompetition")
+    public R getLargeCompetition() {
+        List<AtaiCompetition> competitions = ataiCompetitionService.getLargeCompetition();
+        return R.success().data("large", competitions);
+    }
+
+
     //2 根据比赛id进行查询
     @ApiOperation (value = "根据比赛id进行查询")
     @GetMapping ("getCompetition/{id}")
@@ -117,6 +126,13 @@ public class AtaiCompetitionController {
     //==============================================================================
     //=================================团队管理====================================
     //==============================================================================
+    // 查询用户报名的所有比赛
+    @ApiOperation (value = "获取当前比赛的队伍信息")
+    @GetMapping ("getUserCompetitions/{userId}")
+    public R getUserCompetitions(@PathVariable String userId) {
+        List<AtaiCompetition> ataiCompetitions = ataiCompetitionService.getListByUserId(userId);
+        return R.success().data("data", ataiCompetitions);
+    }
 
     //用户报名比赛
     //1 在比赛中创建队伍,在队伍中创建成员

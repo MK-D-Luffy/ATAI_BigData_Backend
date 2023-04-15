@@ -30,9 +30,6 @@ public class AtaiArticle implements Serializable {
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
-    @ApiModelProperty(value = "摘要")
-    private String summary;
-
     @ApiModelProperty(value = "标题")
     private String title;
 
@@ -42,25 +39,15 @@ public class AtaiArticle implements Serializable {
     @ApiModelProperty(value = "浏览数")
     private Integer viewCounts;
 
-    @ApiModelProperty(value = "权重")
-    private Integer weight;
-
     @ApiModelProperty(value = "作者ID")
     private String authorId;
 
     @ApiModelProperty(value = "文章体ID")
     private String bodyId;
 
-    @ApiModelProperty(value = "文章分类")
-    private String category;
-
     @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
     @TableLogic
     private Integer isDeleted;
-
-    @ApiModelProperty(value = "标签列表")
-    @TableField(fill = FieldFill.INSERT)
-    private String tag;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
@@ -69,6 +56,4 @@ public class AtaiArticle implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
-
-
 }

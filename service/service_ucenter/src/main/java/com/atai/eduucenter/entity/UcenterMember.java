@@ -11,25 +11,22 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 会员表
+ * 用户表
  *
- * @author linshengbin
- * @since 2021-01-22
+ * @author baiyunRain
+ * @since 2023-03-22
  */
 @Data
 @EqualsAndHashCode (callSuper = false)
 @Accessors (chain = true)
-@ApiModel (value = "UcenterMember对象", description = "会员表")
+@ApiModel (value = "UcenterMember对象", description = "用户表")
 public class UcenterMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "会员id")
-    @TableId(value = "id", type = IdType.ID_WORKER_STR)
+    @ApiModelProperty (value = "id")
+    @TableId (value = "id", type = IdType.ID_WORKER_STR)
     private String id;
-
-    @ApiModelProperty(value = "微信openid")
-    private String openid;
 
     @ApiModelProperty(value = "手机号")
     private String mobile;
@@ -48,9 +45,6 @@ public class UcenterMember implements Serializable {
 
     @ApiModelProperty (value = "年龄")
     private Integer age;
-
-    @ApiModelProperty (value = "学历")
-    private String education;
 
     @ApiModelProperty (value = "用户头像")
     private String avatar;
@@ -72,6 +66,5 @@ public class UcenterMember implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
-
 
 }

@@ -31,10 +31,8 @@ import java.util.Map;
 @Service
 public class AtaiDatasetServiceImpl extends ServiceImpl<AtaiDatasetMapper, AtaiDataset> implements AtaiDatasetService {
 
-
     @Autowired
     private AtaiDatasetService ataiDatasetService;
-
     @Autowired
     private UcenterClient ucenterClient;
 
@@ -119,5 +117,20 @@ public class AtaiDatasetServiceImpl extends ServiceImpl<AtaiDatasetMapper, AtaiD
 
         //map返回
         return map;
+    }
+
+    @Override
+    public List<AtaiDataset> getUserDatasets(String userId) {
+        QueryWrapper<AtaiDataset> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        return baseMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<AtaiDataset> getHotDatasets() {
+        QueryWrapper<AtaiDataset> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("download").orderByDesc("watch");
+        wrapper.last("limit 5");
+        return baseMapper.selectList(wrapper);
     }
 }

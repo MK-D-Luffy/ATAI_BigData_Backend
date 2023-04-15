@@ -62,7 +62,7 @@ public class AtaiCourseController {
 
 
     //3 添加课程的方法
-    @ApiOperation (value = "添加比赛")
+    @ApiOperation (value = "添加课程")
     @PostMapping ("addCourse")
     public R addCourse(@RequestBody AtaiCourse ataiCourse) {
         boolean save = ataiCourseService.insert(ataiCourse);
@@ -163,10 +163,10 @@ public class AtaiCourseController {
     //=====================================================================
 
     //1 查询用户报名的课程(以及学习情况)
-    @ApiOperation (value = "根据课程id查询课时")
+    @ApiOperation (value = "查询用户报名的课程")
     @GetMapping ("getCourseUsers/{userId}")
     public R getCourseUsers(@PathVariable String userId) {
-        List<AtaiCourseUser> list = ataiCourseUserService.getListByUserId(userId);
+        List<AtaiCourse> list = ataiCourseService.getListByUserId(userId);
         return R.success().data("userCourses", list);
     }
 
@@ -216,5 +216,15 @@ public class AtaiCourseController {
         }
     }
 
+    //=====================================================================
+    //===============================其他===============================
+    //=====================================================================
+
+    @ApiOperation (value = "根据用户id和课程id判断是否已报名")
+    @GetMapping ("getHotCourses")
+    public R getHotCourses() {
+        List<AtaiCourse> hotCourses = ataiCourseService.getHotCourses();
+        return R.success().data("hotCourses", hotCourses);
+    }
 }
 

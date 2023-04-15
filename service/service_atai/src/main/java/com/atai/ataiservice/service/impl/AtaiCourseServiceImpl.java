@@ -2,9 +2,11 @@ package com.atai.ataiservice.service.impl;
 
 import com.atai.ataiservice.client.UcenterClient;
 import com.atai.ataiservice.entity.AtaiCourse;
+import com.atai.ataiservice.entity.AtaiCourseUser;
 import com.atai.ataiservice.entity.vo.CourseQuery;
 import com.atai.ataiservice.mapper.AtaiCourseMapper;
 import com.atai.ataiservice.service.AtaiCourseService;
+import com.atai.ataiservice.service.AtaiCourseUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -28,13 +27,12 @@ import java.util.Map;
 @Service
 public class AtaiCourseServiceImpl extends ServiceImpl<AtaiCourseMapper, AtaiCourse> implements AtaiCourseService {
 
-
     @Autowired
     private AtaiCourseService ataiCourseService;
-
+    @Autowired
+    private AtaiCourseUserService ataiCourseUserService;
     @Autowired
     private UcenterClient ucenterClient;
-
 
     @Override
     public boolean insert(AtaiCourse ataiCourse) {
@@ -111,5 +109,25 @@ public class AtaiCourseServiceImpl extends ServiceImpl<AtaiCourseMapper, AtaiCou
 
         //map返回
         return map;
+    }
+
+    @Override
+    public List<AtaiCourse> getHotCourses() {
+        QueryWrapper<AtaiCourse> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("participants");
+        wrapper.last("limit 5");
+        return baseMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<AtaiCourse> getListByUserId(String userId) {
+        List<AtaiCourseUser> users = ataiCourseUserService.getListByUserId(userId);
+        List<AtaiCourse> courses = new ArrayList<>();
+        for (AtaiCourseUser user : users) {
+            String courseId = user.getCourseId();
+            AtaiCourse course = ataiCourseService.getById(courseId);
+            courses.add(course);
+        }
+        return courses;
     }
 }

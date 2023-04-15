@@ -24,4 +24,6 @@ public interface AtaiTeamUserService extends IService<AtaiTeamUser> {
     AtaiTeamUser getUsersByUCId(String userId, String competitionId);
 
     List<AtaiTeamUser> getUsersByTeamId(String teamId);
+
+    List<AtaiTeamUser> getCompetitionByUserId(String userId);
 }
