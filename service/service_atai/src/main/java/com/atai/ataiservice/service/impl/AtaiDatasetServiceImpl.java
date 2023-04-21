@@ -127,6 +127,35 @@ public class AtaiDatasetServiceImpl extends ServiceImpl<AtaiDatasetMapper, AtaiD
     }
 
     @Override
+    public DatasetFrontVo getFrontVoById(String id) {
+        DatasetFrontVo vo = new DatasetFrontVo();
+        AtaiDataset ataiDataset = baseMapper.selectById(id);
+        BeanUtils.copyProperties(ataiDataset, vo);
+
+        String userId = ataiDataset.getUserId();
+        UcenterMemberOrder user = ucenterClient.getUserInfoOrder(userId);
+        if (user != null) {
+            vo.setUsername(user.getNickname());
+            vo.setAvatar(user.getAvatar());
+        }
+        return vo;
+    }
+
+    @Override
+    public boolean addWatch(String id) {
+        AtaiDataset ataiDataset = baseMapper.selectById(id);
+        ataiDataset.setWatch(ataiDataset.getWatch() + 1);
+        return baseMapper.updateById(ataiDataset) == 1;
+    }
+
+    @Override
+    public boolean addDownload(String id) {
+        AtaiDataset ataiDataset = baseMapper.selectById(id);
+        ataiDataset.setDownload(ataiDataset.getDownload() + 1);
+        return baseMapper.updateById(ataiDataset) == 1;
+    }
+
+    @Override
     public List<AtaiDataset> getHotDatasets() {
         QueryWrapper<AtaiDataset> wrapper = new QueryWrapper<>();
         wrapper.orderByDesc("download").orderByDesc("watch");

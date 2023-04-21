@@ -5,7 +5,7 @@
     <select id="findByParentIdNull" resultType="com.atai.ataiservice.entity.frontvo.CommentFrontVo">
         SELECT c.*, um.`id` AS authorId, um.`avatar`, um.`nickname`
         FROM atai_comment c,
-             ucenter_member um
+             ucenter_basic um
         WHERE c.`author_id` = um.`id`
           AND c.parent_id IS NULL
           and c.article_id = #{articleId}
@@ -16,7 +16,7 @@
     <select id="findByParentIdNotNull" resultType="com.atai.ataiservice.entity.frontvo.CommentFrontVo">
         SELECT c.*, um.`id` AS authorId, um.`avatar`, um.`nickname`
         FROM atai_comment c,
-             ucenter_member um
+             ucenter_basic um
         WHERE c.`author_id` = um.`id`
           AND c.parent_id = #{id}
         ORDER BY c.`gmt_create` DESC

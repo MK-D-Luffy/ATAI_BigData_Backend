@@ -53,9 +53,9 @@ public class AtaiCourseController {
     @ApiOperation (value = "分页查询带条件")
     @PostMapping ("pageCourse/{page}/{limit}")
     public R pageCourse(@PathVariable long page, @PathVariable long limit,
-                        @RequestBody (required = false) CourseQuery courseQuery) {  //@RequestBody(required = false)参数值可以为空
-        Page<AtaiCourse> compPage = new Page<>(page, limit);
-        Map<String, Object> map = ataiCourseService.getCoursePageList(compPage, courseQuery);
+                        @RequestBody (required = false) CourseQuery courseQuery) {
+        Page<AtaiCourse> coursePage = new Page<>(page, limit);
+        Map<String, Object> map = ataiCourseService.getCoursePageList(coursePage, courseQuery);
         //返回分页所有数据
         return R.success().data(map);
     }
@@ -112,7 +112,7 @@ public class AtaiCourseController {
         return R.success().data("courseClassList", list);
     }
 
-    //2 根据课时id获取课时信息
+    //2 根据课程id获取课时信息
     @ApiOperation (value = "根据课程id查询课时")
     @GetMapping ("getClass/{classId}")
     public R getClass(@PathVariable String classId) {
@@ -179,11 +179,16 @@ public class AtaiCourseController {
         return R.success().data("userCourse", userCourse);
     }
 
-    //2 根据课程添加课时
-    @ApiOperation (value = "根据课程添加课时")
+    //2 用户报名参加课程
+    @ApiOperation (value = "用户报名参加课程")
     @PostMapping ("addCourseUser")
     public R addCourseUser(@RequestBody AtaiCourseUser ataiCourseUser) {
         boolean save = ataiCourseUserService.save(ataiCourseUser);
+        // 增加课程学习人数
+        String courseId = ataiCourseUser.getCourseId();
+        AtaiCourse course = ataiCourseService.getById(courseId);
+        course.setParticipants(course.getParticipants() + 1);
+        ataiCourseService.updateById(course);
         if (save) {
             return R.success().data("userCourse", ataiCourseUser);
         } else {
@@ -207,8 +212,11 @@ public class AtaiCourseController {
     @ApiOperation (value = "逻辑删除用户课程的方法")
     @DeleteMapping ("/user/{userId}/{courseId}")
     public R removeCourseUser(@PathVariable String userId, @PathVariable String courseId) {
-        // 将Mysql中的删除
         Boolean flag = ataiCourseUserService.removeByUCId(userId, courseId);
+        // 减少课程学习人数
+        AtaiCourse course = ataiCourseService.getById(courseId);
+        course.setParticipants(course.getParticipants() - 1);
+        ataiCourseService.updateById(course);
         if (flag) {
             return R.success();
         } else {
@@ -220,11 +228,18 @@ public class AtaiCourseController {
     //===============================其他===============================
     //=====================================================================
 
-    @ApiOperation (value = "根据用户id和课程id判断是否已报名")
+    @ApiOperation (value = "查询5个热门课程")
     @GetMapping ("getHotCourses")
     public R getHotCourses() {
         List<AtaiCourse> hotCourses = ataiCourseService.getHotCourses();
         return R.success().data("hotCourses", hotCourses);
+    }
+
+    @ApiOperation (value = "查询相关课程")
+    @GetMapping ("getRelatedCourses/{courseId}")
+    public R getRelatedCourses(@PathVariable String courseId) {
+        List<AtaiCourse> relatedCourses = ataiCourseService.getRelatedCourses(courseId);
+        return R.success().data("relatedCourses", relatedCourses);
     }
 }
 

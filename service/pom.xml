@@ -12,7 +12,6 @@
     <artifactId>service</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>atai_service_competition</module>
         <module>service_atai</module>
         <module>service_oss</module>
         <module>service_msm</module>

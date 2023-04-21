@@ -52,4 +52,13 @@ public class AtaiTeamJoinServiceImpl extends ServiceImpl<AtaiTeamJoinMapper, Ata
         }
         return users;
     }
+
+    @Override
+    public boolean checkIsParticipated(String userId, String teamId) {
+        QueryWrapper<AtaiTeamJoin> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        wrapper.eq("team_id", teamId);
+        AtaiTeamJoin ataiTeamJoin = baseMapper.selectOne(wrapper);
+        return ataiTeamJoin != null;
+    }
 }

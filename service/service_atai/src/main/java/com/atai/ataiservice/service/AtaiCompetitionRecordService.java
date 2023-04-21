@@ -1,6 +1,7 @@
 package com.atai.ataiservice.service;
 
 import com.atai.ataiservice.entity.AtaiCompetitionRecord;
+import com.atai.ataiservice.entity.frontvo.CompetitionRecordFrontVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface AtaiCompetitionRecordService extends IService<AtaiCompetitionRe
 
     List<AtaiCompetitionRecord> getRecordByUserId(String userId);
 
-    List<AtaiCompetitionRecord> getRecordByTeamId(String teamId);
+    List<CompetitionRecordFrontVo> getRecordByTeamId(String teamId);
 }

@@ -4,6 +4,7 @@ package com.atai.ataiservice.controller;
 import com.atai.ataiservice.client.OssClient;
 import com.atai.ataiservice.client.UcenterClient;
 import com.atai.ataiservice.entity.*;
+import com.atai.ataiservice.entity.frontvo.CompetitionRecordFrontVo;
 import com.atai.ataiservice.entity.vo.CompetitionQuery;
 import com.atai.ataiservice.service.*;
 import com.atai.commonutils.ordervo.UcenterMemberOrder;
@@ -70,7 +71,7 @@ public class AtaiCompetitionController {
     }
 
 
-    //2 根据比赛id进行查询
+    //3 根据比赛id进行查询
     @ApiOperation (value = "根据比赛id进行查询")
     @GetMapping ("getCompetition/{id}")
     public R getCompetition(@PathVariable String id) {
@@ -78,7 +79,7 @@ public class AtaiCompetitionController {
         return R.success().data("competition", ataiCompetition);
     }
 
-    //3 添加比赛接口的方法
+    //4 添加比赛接口的方法
     @ApiOperation (value = "添加比赛")
     @PostMapping ("addCompetition")
     public R addCompetition(@RequestBody AtaiCompetition ataiCompetition) {
@@ -90,7 +91,7 @@ public class AtaiCompetitionController {
         }
     }
 
-    //4 比赛修改功能
+    //5 比赛修改功能
     @ApiOperation (value = "比赛修改")
     @PostMapping ("updateCompetition")
     public R updateCompetition(@RequestBody AtaiCompetition ataiCompetition) {
@@ -102,7 +103,7 @@ public class AtaiCompetitionController {
         }
     }
 
-    //5 逻辑删除比赛的方法
+    //6 逻辑删除比赛的方法
     @ApiOperation (value = "逻辑删除比赛")
     @DeleteMapping ("/{id}")
     public R removeCompetition(@ApiParam (name = "id", value = "比赛ID", required = true)
@@ -134,7 +135,7 @@ public class AtaiCompetitionController {
         return R.success().data("data", ataiCompetitions);
     }
 
-    //用户报名比赛
+    // 用户报名比赛
     //1 在比赛中创建队伍,在队伍中创建成员
     @ApiOperation (value = "报名比赛")
     @PostMapping ("attendCompetition/{userId}")
@@ -146,6 +147,11 @@ public class AtaiCompetitionController {
             String competitionId = competitionTeam.getCompetitionId();
             Date gmtCreate = competitionTeam.getGmtCreate();
             Date gmtModified = competitionTeam.getGmtModified();
+
+            // 添加报名人数
+            AtaiCompetition competition = ataiCompetitionService.getById(competitionId);
+            competition.setParticipants(competition.getParticipants() + 1);
+            ataiCompetitionService.updateById(competition);
 
             AtaiTeamUser teamUser = new AtaiTeamUser();
             teamUser.setTeamId(teamId);
@@ -167,7 +173,7 @@ public class AtaiCompetitionController {
         }
     }
 
-    //根据用户id,比赛id查询队伍信息
+    // 根据用户id,比赛id查询队伍信息
     @ApiOperation (value = "根据用户id,比赛id查询是否报名比赛信息")
     @GetMapping ("getTeamByUserCompetition/{userId}/{competitionId}")
     public R getUserCompetition(@PathVariable String userId,
@@ -176,7 +182,7 @@ public class AtaiCompetitionController {
         return R.success().data("teamUser", teamUser);
     }
 
-    //根据teamId获取当前比赛的队伍信息
+    // 根据teamId获取当前比赛的队伍信息
     @ApiOperation (value = "获取当前比赛的队伍信息")
     @GetMapping ("getCompetitionTeam/{teamId}")
     public R getCompetitionTeam(@PathVariable String teamId) {
@@ -184,7 +190,7 @@ public class AtaiCompetitionController {
         return R.success().data("data", ataiCompetitionTeam);
     }
 
-    //根据队伍id获取队友
+    // 根据队伍id获取队友
     @ApiOperation (value = "根据队伍id获取队友")
     @GetMapping ("getTeamUsers/{teamId}")
     public R getTeamUsers(@PathVariable String teamId) {
@@ -193,13 +199,14 @@ public class AtaiCompetitionController {
     }
 
 
-    //分页查找所有队伍
+    // 分页查找所有队伍
     @ApiOperation (value = "条件查询带分页查询队伍")
-    @PostMapping ("pageTeamCondition/{current}/{limit}")
+    @PostMapping ("pageTeamCondition/{current}/{limit}/{teamId}/{userId}")
     public R getTeamPageList(@PathVariable long current, @PathVariable long limit,
+                             @PathVariable String teamId, @PathVariable String userId,
                              @RequestParam (required = false) String name) {
         Page<AtaiCompetitionTeam> teamPage = new Page<>(current, limit);
-        Map<String, Object> map = ataiCompetitionTeamService.getTeamPageList(teamPage, name);
+        Map<String, Object> map = ataiCompetitionTeamService.getTeamPageList(teamPage, teamId, userId, name);
         //返回分页所有数据
         return R.success().data(map);
     }
@@ -208,7 +215,7 @@ public class AtaiCompetitionController {
     //【组队申请相关】
     //设置是否允许被查找
 
-    //通过用户id,比赛id,队伍id申请组队
+    // 通过用户id,比赛id,队伍id申请组队
     @ApiOperation (value = "通过用户id,比赛id,队伍id申请组队")
     @PostMapping ("joinTeam")
     public R joinTeam(@RequestBody (required = false) AtaiTeamJoin ataiTeamJoin) {
@@ -221,23 +228,27 @@ public class AtaiCompetitionController {
     }
 
 
-    //通过teamId和userId同意组队,修改teamUser的teamId
+    // 通过teamId和userId同意组队,修改teamUser的teamId
     @ApiOperation (value = "同意组队申请")
-    @GetMapping ("acceptJoinTeam/{userId}/{competitionId}/{teamId}")
+    @GetMapping ("acceptJoinTeam/{userId}/{competitionId}/{oldTeamId}/{newTeamId}")
     public R acceptJoinTeam(@PathVariable String userId,
                             @PathVariable String competitionId,
-                            @PathVariable String teamId) {
+                            @PathVariable String oldTeamId,
+                            @PathVariable String newTeamId) {
+        // 修改发出申请的用户,将他的队伍id变为新的队伍id
         AtaiTeamUser teamUser = ataiTeamUserService.getTeamByCUId(competitionId, userId);
-        teamUser.setTeamId(teamId);
+        teamUser.setTeamId(newTeamId);
         teamUser.setIsLeader(0);
-
         String id = teamUser.getId();
         QueryWrapper<AtaiTeamUser> wrapper = new QueryWrapper<>();
         wrapper.eq("id", id);
-
         ataiTeamUserService.update(teamUser, wrapper);
-        Boolean flag = ataiTeamJoinService.deleteByUCTId(userId, competitionId, teamId);
-//        ataiCompetitionTeamService.removeById(teamId);
+
+        // 删除发出申请的用户的原先的比赛队伍信息
+        ataiCompetitionTeamService.deleteOldCompetitionTeamById(oldTeamId);
+
+        // 删除团队申请的信息
+        Boolean flag = ataiTeamJoinService.deleteByUCTId(userId, competitionId, newTeamId);
         if (flag) {
             return R.success();
         } else {
@@ -245,7 +256,7 @@ public class AtaiCompetitionController {
         }
     }
 
-    //拒绝组队申请
+    // 拒绝组队申请
     @ApiOperation (value = "拒绝组队申请")
     @GetMapping ("refuseJoinTeam/{userId}/{competitionId}/{teamId}")
     public R refuseJoinTeam(@PathVariable String userId,
@@ -260,7 +271,7 @@ public class AtaiCompetitionController {
     }
 
 
-    //通过teamId和competitionId查询申请和我组队的人
+    // 通过teamId和competitionId查询申请和我组队的人
     @ApiOperation (value = "")
     @GetMapping ("getJoinTeamUser/{competitionId}/{teamId}")
     public R getJoinTeamUser(@PathVariable String competitionId,
@@ -292,7 +303,7 @@ public class AtaiCompetitionController {
         }
     }
 
-    //通过用户id获取提交结果
+    // 通过用户id获取提交结果
     @ApiOperation (value = "通过用户id获取提交结果")
     @GetMapping ("getRecordByUserId/{competitionId}/{userId}")
     public R getRecordByUserId(@PathVariable String competitionId,
@@ -301,17 +312,17 @@ public class AtaiCompetitionController {
         return R.success().data("records", records);
     }
 
-    //通过队伍id获取提交结果
+    // 通过队伍id获取提交结果
     @ApiOperation (value = "通过队伍id获取提交结果")
     @GetMapping ("getRecordByTeamId/{competitionId}/{teamId}")
     public R getRecordByTeamId(@PathVariable String competitionId,
                                @PathVariable String teamId) {
-        List<AtaiCompetitionRecord> records = ataiCompetitionRecordService.getRecordByTeamId(teamId);
+        List<CompetitionRecordFrontVo> records = ataiCompetitionRecordService.getRecordByTeamId(teamId);
         return R.success().data("records", records);
     }
 
 
-    //根据比赛id，查询根据比赛id，token(用户id)查询信息
+    // 根据比赛id，查询根据比赛id，token(用户id)查询信息
     @ApiOperation (value = "根据比赛id，查询所有的排名")
     @GetMapping ("getRankList/{competitionId}")
     public R getRankList(@PathVariable String competitionId) {

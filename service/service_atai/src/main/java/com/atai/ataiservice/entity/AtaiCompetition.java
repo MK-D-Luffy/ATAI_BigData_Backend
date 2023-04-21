@@ -63,10 +63,13 @@ public class AtaiCompetition extends Model<AtaiCompetition> {
     @ApiModelProperty (value = "提交文件的类型 1代码 0结果文件")
     private Integer submitType;
 
-    @ApiModelProperty (value = "结果集数据路径")
+    @ApiModelProperty (value = "数据集路径")
+    private String data;
+
+    @ApiModelProperty (value = "结果集路径")
     private String result;
 
-    @ApiModelProperty (value = "赛题数据路径")
+    @ApiModelProperty (value = "大型赛事的封面")
     private String cover;
 
     @ApiModelProperty (value = "是否为大型赛事")

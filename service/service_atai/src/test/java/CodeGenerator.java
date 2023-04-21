@@ -17,7 +17,7 @@ public class CodeGenerator {
         GlobalConfig config = new GlobalConfig();
         config.setActiveRecord(true) //是否支持AR模式
                 .setAuthor("baiyunRain") //作者
-                .setOutputDir("D:\\Projects\\JavaProjects\\ATAI_BigData_Backend\\service\\service_atai\\src\\main\\java")
+                .setOutputDir("D:\\Projects\\JavaProjects\\ATAI_BigData_Backend\\service\\service_ucenter\\src\\main\\java")
                 //生成路径
                 .setFileOverride(true) //文件覆盖
                 .setServiceName("%sService") //设置生成的service接口名 首字母是否为I
@@ -41,7 +41,7 @@ public class CodeGenerator {
         stConfig.setCapitalMode(true) // 全局大写命名
                 .setNaming(NamingStrategy.underline_to_camel) // 数据库表映射到实体的命名策略
                 .setColumnNaming(NamingStrategy.underline_to_camel)
-                .setInclude("atai_competition_record") //生成的表
+                .setInclude("ucenter_basic") //生成的表
                 .setTablePrefix("") // 表前缀
                 .setEntityLombokModel(true) // lombok模型
                 .setRestControllerStyle(true)   //restful api风格转换器
@@ -51,7 +51,7 @@ public class CodeGenerator {
         // 包名策略
         PackageConfig pkConfig = new PackageConfig();
         pkConfig.setParent("com.atai")
-                .setModuleName("ataiservice")
+                .setModuleName("ucenter")
                 .setController("controller")
                 .setEntity("entity")
                 .setService("service");

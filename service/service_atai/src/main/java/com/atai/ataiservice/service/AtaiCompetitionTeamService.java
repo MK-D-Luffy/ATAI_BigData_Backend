@@ -17,7 +17,9 @@ import java.util.Map;
  */
 public interface AtaiCompetitionTeamService extends IService<AtaiCompetitionTeam> {
 
-    Map<String, Object> getTeamPageList(Page<AtaiCompetitionTeam> teamPage, String name);
+    Map<String, Object> getTeamPageList(Page<AtaiCompetitionTeam> teamPage, String teamId, String userId, String name);
 
     List<AtaiCompetitionTeam> getRankList(String competitionId);
+
+    void deleteOldCompetitionTeamById(String teamId);
 }

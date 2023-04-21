@@ -41,4 +41,7 @@ public class TeamFrontVo extends Model<TeamFrontVo> {
     @ApiModelProperty (value = "队员信息")
     private List<AtaiTeamUser> users;
 
+    @ApiModelProperty (value = "该队伍是否已申请")
+    private boolean isParticipated;
+
 }

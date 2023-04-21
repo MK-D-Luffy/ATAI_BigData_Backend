@@ -19,4 +19,6 @@ public interface AtaiTeamJoinService extends IService<AtaiTeamJoin> {
     Boolean deleteByUCTId(String userId, String competitionId, String teamId);
 
     List<AtaiTeamUser> getUsersByCTId(String competitionId, String teamId);
+
+    boolean checkIsParticipated(String userId, String teamId);
 }

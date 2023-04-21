@@ -4,6 +4,7 @@ package com.atai.ataiservice.controller;
 import cn.hutool.core.date.DateUtil;
 import com.atai.ataiservice.client.OssClient;
 import com.atai.ataiservice.entity.AtaiDataset;
+import com.atai.ataiservice.entity.frontvo.DatasetFrontVo;
 import com.atai.ataiservice.entity.vo.DatasetQuery;
 import com.atai.ataiservice.service.AtaiDatasetService;
 import com.atai.commonutils.result.R;
@@ -37,8 +38,8 @@ public class AtaiDatasetController {
     @ApiOperation (value = "根据数据集id进行查询")
     @GetMapping ("getDataset/{id}")
     public R getDataset(@PathVariable String id) {
-        AtaiDataset ataiDatasets = ataiDatasetService.getById(id);
-        return R.success().data("dataset", ataiDatasets);
+        DatasetFrontVo datasetFrontVo = ataiDatasetService.getFrontVoById(id);
+        return R.success().data("dataset", datasetFrontVo);
     }
 
     //2 根据用户id进行查询
@@ -119,12 +120,33 @@ public class AtaiDatasetController {
         return R.success().data("userDatasets", userDatasets);
     }
 
+    @ApiOperation (value = "添加浏览量")
+    @GetMapping ("addWatch/{id}")
+    public R addWatch(@PathVariable String id) {
+        boolean updateFlag = ataiDatasetService.addWatch(id);
+        if (updateFlag) {
+            return R.success();
+        } else {
+            return R.error();
+        }
+    }
+
+    @ApiOperation (value = "添加下载量")
+    @GetMapping ("addDownload/{id}")
+    public R addDownload(@PathVariable String id) {
+        boolean updateFlag = ataiDatasetService.addDownload(id);
+        if (updateFlag) {
+            return R.success();
+        } else {
+            return R.error();
+        }
+    }
+
     @ApiOperation (value = "根据用户id和课程id判断是否已报名")
     @GetMapping ("getHotDatasets")
     public R getHotDatasets() {
         List<AtaiDataset> hotDatasets = ataiDatasetService.getHotDatasets();
         return R.success().data("hotDatasets", hotDatasets);
     }
-
 }
 

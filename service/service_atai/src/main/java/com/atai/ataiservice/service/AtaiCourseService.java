@@ -27,4 +27,6 @@ public interface AtaiCourseService extends IService<AtaiCourse> {
     List<AtaiCourse> getHotCourses();
 
     List<AtaiCourse> getListByUserId(String userId);
+
+    List<AtaiCourse> getRelatedCourses(String courseId);
 }

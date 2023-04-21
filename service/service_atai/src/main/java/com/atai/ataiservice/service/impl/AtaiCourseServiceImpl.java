@@ -66,14 +66,14 @@ public class AtaiCourseServiceImpl extends ServiceImpl<AtaiCourseMapper, AtaiCou
         if (!StringUtils.isEmpty(status)) {
             switch (status) {
                 case "进行中":
-                    wrapper.gt("begin", date);
-                    wrapper.lt("end", date);
+                    wrapper.lt("begin", date);
+                    wrapper.gt("end", date);
                     break;
                 case "即将开始":
-                    wrapper.lt("begin", date);
+                    wrapper.gt("begin", date);
                     break;
                 case "已经结束":
-                    wrapper.gt("end", date);
+                    wrapper.lt("end", date);
                     break;
                 default:
                     break;
@@ -129,5 +129,14 @@ public class AtaiCourseServiceImpl extends ServiceImpl<AtaiCourseMapper, AtaiCou
             courses.add(course);
         }
         return courses;
+    }
+
+    @Override
+    public List<AtaiCourse> getRelatedCourses(String courseId) {
+        QueryWrapper<AtaiCourse> wrapper = new QueryWrapper<>();
+        wrapper.ne("id", courseId);
+        wrapper.orderByDesc("rand()");
+        wrapper.last("limit 2");
+        return baseMapper.selectList(wrapper);
     }
 }

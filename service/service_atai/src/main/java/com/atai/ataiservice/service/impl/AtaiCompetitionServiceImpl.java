@@ -106,14 +106,14 @@ public class AtaiCompetitionServiceImpl extends ServiceImpl<AtaiCompetitionMappe
 
     public String saveFile(MultipartFile multipartFile) {
         //需要保存的路径
-        String uploadPath = "D:\\Projects\\JavaProjects\\ATAI_BigData_Backend\\service\\service_atai\\src\\main\\resources\\upload\\";
+        String uploadPath = System.getProperty("user.dir") + "\\upload\\";
         String today = DateUtil.today();
         uploadPath += today;
         //获取源文件名
         String originalFilename = multipartFile.getOriginalFilename();
         //为文件生成唯一的uuid
         Snowflake snowflake = IdUtil.createSnowflake(1, 1);
-        String uuid = snowflake.nextIdStr();
+        String uuid = snowflake.nextIdStr().substring(0, 9);
         //创建空文件
         File file = new File(uploadPath + File.separator + uuid + originalFilename);
         //保存之后的文件路径
@@ -200,8 +200,10 @@ public class AtaiCompetitionServiceImpl extends ServiceImpl<AtaiCompetitionMappe
         if (score > oldScore) {
             competitionTeam.setScore(score);
             competitionTeam.setBestTime(date);
-            ataiCompetitionTeamService.updateById(competitionTeam);
         }
+        //提交后可提交次数减一
+        competitionTeam.setSubmitCounts(competitionTeam.getSubmitCounts() - 1);
+        ataiCompetitionTeamService.updateById(competitionTeam);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.atai.ataiservice.entity.AtaiTeamUser;
 import com.atai.ataiservice.entity.frontvo.TeamFrontVo;
 import com.atai.ataiservice.mapper.AtaiCompetitionTeamMapper;
 import com.atai.ataiservice.service.AtaiCompetitionTeamService;
+import com.atai.ataiservice.service.AtaiTeamJoinService;
 import com.atai.ataiservice.service.AtaiTeamUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,17 +33,19 @@ public class AtaiCompetitionTeamServiceImpl extends ServiceImpl<AtaiCompetitionT
 
     @Autowired
     private AtaiTeamUserService ataiTeamUserService;
+    @Autowired
+    private AtaiTeamJoinService ataiTeamJoinService;
 
     @Override
-    public Map<String, Object> getTeamPageList(Page<AtaiCompetitionTeam> teamPage, String name) {
+    public Map<String, Object> getTeamPageList(Page<AtaiCompetitionTeam> teamPage, String teamId, String userId, String name) {
         QueryWrapper<AtaiCompetitionTeam> wrapper = new QueryWrapper<>();
 
         //判断条件值是否为空，不为空拼接
         if (!StringUtils.isEmpty((name))) {//关键字
             wrapper.like("name", name);
         }
-        //wrapper.ne("id",id);
-//        wrapper.eq("is_allowed", 1);
+        wrapper.ne("id", teamId);
+        wrapper.eq("is_allowed", 1);
 
         //把分页数据封装到pageComp对象里去
         baseMapper.selectPage(teamPage, wrapper);
@@ -54,6 +57,11 @@ public class AtaiCompetitionTeamServiceImpl extends ServiceImpl<AtaiCompetitionT
             BeanUtils.copyProperties(record, team);
             List<AtaiTeamUser> users = ataiTeamUserService.getUsersByTCId(record.getId(), record.getCompetitionId());
             team.setUsers(users);
+
+            // 查看userId对应的用户是否已经申请了该队伍
+            boolean flag = ataiTeamJoinService.checkIsParticipated(userId, team.getId());
+            team.setParticipated(flag);
+
             list.add(team);
         }
 
@@ -84,5 +92,12 @@ public class AtaiCompetitionTeamServiceImpl extends ServiceImpl<AtaiCompetitionT
         wrapper.eq("competition_id", competitionId);
         wrapper.orderByDesc("score");
         return baseMapper.selectList(wrapper);
+    }
+
+    @Override
+    public void deleteOldCompetitionTeamById(String teamId) {
+        QueryWrapper<AtaiCompetitionTeam> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", teamId);
+        baseMapper.delete(wrapper);
     }
 }

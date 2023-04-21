@@ -1,6 +1,7 @@
 package com.atai.ataiservice.service;
 
 import com.atai.ataiservice.entity.AtaiDataset;
+import com.atai.ataiservice.entity.frontvo.DatasetFrontVo;
 import com.atai.ataiservice.entity.vo.DatasetQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -25,8 +26,13 @@ public interface AtaiDatasetService extends IService<AtaiDataset> {
     //分页查询比赛的方法
     Map<String, Object> getDatasetPageList(Page<AtaiDataset> datasetPage, DatasetQuery datasetQuery);
 
+    boolean addWatch(String id);
+
+    boolean addDownload(String id);
 
     List<AtaiDataset> getHotDatasets();
 
     List<AtaiDataset> getUserDatasets(String userId);
+
+    DatasetFrontVo getFrontVoById(String id);
 }

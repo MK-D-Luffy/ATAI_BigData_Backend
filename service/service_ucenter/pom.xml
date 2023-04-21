@@ -11,6 +11,11 @@
 
     <artifactId>service_ucenter</artifactId>
     <dependencies>
+        <dependency>
+            <groupId>com.atai</groupId>
+            <artifactId>common_utils</artifactId>
+            <version>1.0</version>
+        </dependency>
         <!--httpclient-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
